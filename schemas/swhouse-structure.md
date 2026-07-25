@@ -34,7 +34,7 @@ Declares which agents are available on the current machine and maps them to the 
 
 ```yaml
 framework_version: "0.1.0"
-framework_repo: "https://github.com/[org]/software-house-ai"
+framework_repo: "https://github.com/simpego81/software-house-ai"
 
 instance:
   machine: "string"          # descriptive label for this machine

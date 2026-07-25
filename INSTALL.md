@@ -20,7 +20,7 @@ Copy the template directory into your project root:
 
 ```bash
 # Clone the framework (or use a specific tag for stability)
-git clone https://github.com/[org]/software-house-ai.git /tmp/swh
+git clone https://github.com/simpego81/software-house-ai.git /tmp/swh
 
 # Copy the template into your project
 cp -r /tmp/swh/instances/claude-code/.swhouse-template your-project/.swhouse
@@ -43,7 +43,7 @@ Edit `.swhouse/instance.yaml` to declare which agents are available on your mach
 ```yaml
 # .swhouse/instance.yaml
 framework_version: "0.1.0"
-framework_repo: "https://github.com/[org]/software-house-ai"
+framework_repo: "https://github.com/simpego81/software-house-ai"
 
 instance:
   machine: "your-machine-name"   # descriptive label, not enforced
@@ -217,7 +217,7 @@ To upgrade to a newer version of `software-house-ai`:
 Pinning to a git tag is recommended for stability:
 
 ```bash
-git clone --branch v0.1.0 https://github.com/[org]/software-house-ai.git
+git clone --branch v0.1.0 https://github.com/simpego81/software-house-ai.git
 ```
 
 ---

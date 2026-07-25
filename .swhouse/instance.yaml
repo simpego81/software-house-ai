@@ -1,5 +1,5 @@
 framework_version: "0.1.0"
-framework_repo: "https://github.com/simprego81/software-house-ai"
+framework_repo: "https://github.com/simpego81/software-house-ai"
 
 instance:
   machine: "dev-pc-windows"
