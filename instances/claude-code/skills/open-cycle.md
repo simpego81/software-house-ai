@@ -40,10 +40,12 @@ problem: "[problem statement from args]"
 4. Execute Step 1 as the COORDINATOR agent (see `agents/10-coordinator.md` for output format).
    Write the output to `cycles/current.md` under `## Step 1 — Coordinator`.
 
-5. Ask the user:
-   > "Step 1 complete. Continue to Step 2 (Product Owner)? [Y/n]"
-   
-   If yes, proceed to Step 2 automatically.
+5. Inform the user:
+   > "Step 1 complete. Cycle 001 is open. **End this session now.**
+   > In the next session, open `cycles/current.md` and run Step 2 (Product Owner).
+   > One step per session — this is the Time-Sliced Execution model."
+
+   Do NOT auto-continue to Step 2. The session must end after Step 1.
 
 ## Example
 

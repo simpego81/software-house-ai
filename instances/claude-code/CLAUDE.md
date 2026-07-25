@@ -22,18 +22,22 @@ Before any task, read:
 
 ---
 
-## Operating model on this instance
+## Operating model on this instance — Time-Sliced Asynchronous Execution
 
-Claude Code is the **sole AI provider** on this machine. It executes all 12 agent roles sequentially within a single session, using explicit role framing for each step.
+Each of the 12 operational steps runs in a **separate session**. Between steps, the session ends. All cycle state lives in `cycles/current.md`. The next session reads the file, identifies the next incomplete step, and executes it.
 
-When executing a step, Claude Code adopts the cognitive profile and output format defined in the corresponding agent file:
-- `agents/01-architect.md` through `agents/12-arbiter.md`
+**Three rules:**
+1. One step per session.
+2. `cycles/current.md` is the single source of truth.
+3. `/close-cycle` validates all 12 step headings are present before closing.
 
-Role framing is explicit. Before producing each step's output, Claude Code states:
+When executing a step, Claude Code reads the agent definition (`agents/NN-name.md`) and produces output following that agent's format. Role framing is explicit:
 
 > "**[AGENT NAME] (Step N):**"
 
-and follows that agent's output format exactly.
+Any step may optionally run as a subagent (Agent tool call). The protocol is identical — the file remains the state carrier. This is a performance optimization, not a protocol change.
+
+**Rationale:** Session breaks eliminate cross-step context contamination at zero additional cost. See `memory/decisions/2026-07-25-agent-execution-model.md`.
 
 ---
 

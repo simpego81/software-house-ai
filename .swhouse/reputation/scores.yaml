@@ -1,0 +1,8 @@
+version: 1
+last_updated: "2026-07-25"
+operators:
+  - id: "claude-sonnet-4-6"
+    total_interventions: 2
+    total_score: 16.0
+    average_score: 8.0
+    last_intervention: "2026-07-25"

@@ -111,6 +111,21 @@ Some communication occurs outside the 12-step cycle:
 
 ---
 
+## Git history protection
+
+The `.swhouse/` directory is the organizational memory. Its git history is the audit trail for all decisions made by the ecosystem.
+
+**Rule:** Commits that touch `.swhouse/` must never be rewritten. Specifically:
+- No `git push --force` on any branch containing `.swhouse/` commits
+- No `git rebase` that removes or rewrites `.swhouse/` commits
+- No `git commit --amend` on commits that include `.swhouse/` changes
+
+This rule is grounded in Article 6 (Transparency) and Article 7 (Memory) of the Constitution. Violation invalidates the audit trail and is treated as a protocol breach. Decided in Cycle 001.
+
+Exception: the Owner may explicitly authorize a rewrite to correct a security incident (e.g., accidental commit of credentials). Any such exception must be documented in a new memory entry.
+
+---
+
 ## Communication between instances on different machines
 
 When multiple operators work on the same project from different machines, coordination happens through git:
