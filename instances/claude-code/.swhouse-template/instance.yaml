@@ -1,0 +1,44 @@
+framework_version: "0.1.0"
+framework_repo: "https://github.com/[org]/software-house-ai"
+
+instance:
+  machine: "your-machine-name"
+  operator: "your-name"
+
+agents:
+  - role: ARCHITECT
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: EXPLORER
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: CRITIC
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: DESTROYER
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: BUILDER
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: OPTIMIZER
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: LIBRARIAN
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: SCIENTIST
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: PRODUCT_OWNER
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: COORDINATOR
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: EVOLUTION_MASTER
+    provider: claude
+    model: claude-sonnet-4-6
+  - role: ARBITER
+    provider: claude
+    model: claude-sonnet-4-6

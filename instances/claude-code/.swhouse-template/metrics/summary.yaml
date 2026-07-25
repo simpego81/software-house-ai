@@ -1,0 +1,15 @@
+version: 1
+last_updated: null
+total_cycles: 0
+cycles_by_status:
+  decided: 0
+  deferred: 0
+  escalated: 0
+average_cycle_duration_days: null
+memory_entries:
+  decisions: 0
+  patterns: 0
+  errors: 0
+  knowledge: 0
+knowledge_reuse_rate: null
+evidence_rate: null
