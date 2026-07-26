@@ -129,12 +129,14 @@ The Optimizer's output replaces the Builder's solution as the working proposal.
 ### Step 9 — SCIENTIST: Verify
 
 **Output required:**
-- Verification method used (benchmark, experiment, simulation, comparison, logical proof)
+- Verification method used (benchmark, experiment, simulation, comparison, logical proof, browser observation)
 - Results of verification
 - Confidence level with explicit reasoning
 - Open hypotheses that could not be verified
 
 If verification is not possible at this stage, the Scientist must state why and propose a future verification plan.
+
+**Frontend deliverables**: for any solution whose output is HTML, JavaScript, WebGL, or a browser-rendered artifact, logical inspection alone does **not** satisfy this step. The required method is **browser observation** — open the deliverable in a browser and directly confirm visual rendering and absence of console errors. See [protocols/frontend-checklist.md](frontend-checklist.md).
 
 ---
 

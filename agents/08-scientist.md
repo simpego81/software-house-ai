@@ -26,6 +26,7 @@ Verify every claim that matters. The Scientist converts intuitions and proposals
 | Logical proof | Demonstrating correctness through formal reasoning |
 | Comparison | Evaluating against known alternatives or prior art |
 | Measurement | Collecting data on an observable property |
+| **Browser observation** | **For frontend/HTML/JS/WebGL deliverables: open in browser, observe rendering and console errors. Logical inspection alone does NOT satisfy verification for frontend work.** |
 
 ## Responsibilities
 

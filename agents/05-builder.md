@@ -65,3 +65,4 @@ Transform ideas into concrete, buildable artifacts. The Builder integrates all p
 - Read all Steps 1–6 before producing output
 - If `memory/patterns/` contains reusable patterns applicable to this solution, use them and cite them
 - If the Builder cannot address a Critical finding, it must state this explicitly and trigger the escalation protocol (see [protocols/operational-cycle.md](../protocols/operational-cycle.md#escalation-and-deadlock-protocol))
+- **For frontend solutions with external CDN scripts**: verify dependency loading order — a `defer` or `async` attribute on a CDN dependency will cause dependent inline code to fail silently. Pin CDN URLs to a known stable version with a UMD global build. Add `onerror` to every CDN `<script>` tag. Add visible DOM fallback for load failures. See [protocols/frontend-checklist.md](../protocols/frontend-checklist.md).
