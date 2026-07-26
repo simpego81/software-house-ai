@@ -105,6 +105,40 @@ Proposals that modify the Constitution or operational rules follow an extended r
 
 ---
 
+## Process Gap Commission (Article 18)
+
+A Process Gap Commission is opened when a defect reaches delivery that the process should have intercepted. It is mandatory, not optional.
+
+### Trigger (any one is sufficient)
+
+- A bug is found in a delivered artifact that a process gate should have caught
+- Any agent identifies a systematic process gap during a cycle
+- The Evolution Master finds the same class of defect recurring
+- The PQM audit finds >3 HIGH findings in a single audit
+
+### Flow
+
+| Step | Agent | Action |
+|------|-------|--------|
+| 1 | COORDINATOR | Opens a `type: rule-evolution` cycle. Problem statement: "Which gate failed and why?" |
+| 2 | CRITIC | Identifies the specific gate that failed. Quotes the rule (or its absence) that permitted the bug through. |
+| 3 | EVOLUTION MASTER | Proposes the rule(s) that would have closed the gap. References the failing case as validation. |
+| 4 | SCIENTIST | Verifies: would the proposed rule have actually caught this specific bug? |
+| 5 | ARBITER | Decides: operational rule (Article 11) or constitutional amendment (Article 12)? |
+| 6 | LIBRARIAN | Creates entry in `memory/errors/` with root cause + rule proposed + outcome. |
+
+### Output
+
+- Updated rule in `protocols/` or `agents/` (if operational)
+- Updated `CONSTITUTION.md` (if constitutional, after Owner approval)
+- Memory entry in `.swhouse/memory/errors/YYYY-MM-DD-title.md`
+
+### Responsibility
+
+If no agent opens the commission within the next cycle after a delivery defect is identified, the Evolution Master is responsible for opening it. The commission cannot be silently skipped.
+
+---
+
 ## Review of the review protocol
 
 This protocol may be revised through the standard rule evolution process (Article 11). The Evolution Master flags review bottlenecks during Step 11 of each cycle. Proposals for change are evaluated in a dedicated `type: rule-evolution` cycle.
