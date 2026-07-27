@@ -6,12 +6,80 @@
 
 ## Overview
 
-Communication between agents in the Software House AI is **file-based and asynchronous**. All inter-agent communication is recorded in the cycle record (`cycles/current.md`). There is no real-time messaging channel — the cycle document is the shared workspace.
+Communication in the Software House AI has two layers:
 
-This design ensures:
-- Every agent contribution is logged and attributable
-- The conversation is reproducible and auditable
-- Any agent that can read and write Markdown can participate
+1. **Human ↔ Ecosystem** — the human operator communicates exclusively through the COORDINATOR (see section below).
+2. **Agent ↔ Agent** — file-based and asynchronous via the cycle record (`cycles/current.md`).
+
+Both layers ensure that every contribution is logged, attributable, and reproducible.
+
+---
+
+## Human Interface — COORDINATOR as Single Entry Point
+
+The human operator always directs requests, questions, and feedback to the **COORDINATOR** (Agent 10). The COORDINATOR is the permanent, stable interface between the human and the agent ecosystem.
+
+```
+Human → COORDINATOR → [delegates to] → Agents
+                   ↑                       |
+                   └─── outputs visible ───┘
+```
+
+**Rules:**
+
+- The human never needs to know which internal agent is handling a task. The COORDINATOR routes requests and coordinates responses.
+- When agents produce output, it is shown **directly and transparently** to the human with an explicit role prefix (see below). The COORDINATOR does not summarize or filter — the team works visibly.
+- The COORDINATOR always speaks first in any interaction. If a session starts without an open cycle, the COORDINATOR acknowledges the request and determines the appropriate path (open a cycle, delegate to a specific agent, or answer directly).
+- The human operator retains the right to escalate directly to Owner/Arbiter level at any time. This is the exception to the single-interface rule and does not require going through the COORDINATOR.
+
+---
+
+## Agent Invocation — Explicit Role Announcement
+
+**During any operational cycle**, every agent must announce its role explicitly when producing output. This applies in the chat, terminal, and cycle record.
+
+### Format
+
+```
+[ROLE_NAME]: output content
+```
+
+Examples:
+
+```
+[COORDINATOR]: Opening cycle 003 — problem: define the OHLCV data format.
+
+[PRODUCT OWNER]: The value of this decision is...
+
+[ARCHITECT]: I propose two structural approaches...
+
+[CRITIC]: Approach A has the following weaknesses...
+
+[ARBITER]: Decision — ACCEPTED. Rationale: ...
+```
+
+### Rules
+
+- The prefix `[ROLE_NAME]` appears at the **beginning of every step output** in the chat or terminal.
+- During multi-step cycles, the transition between roles is announced: `[COORDINATOR]: Step 3 complete. Invoking [ARCHITECT].`
+- If a single provider (e.g., Claude Code) executes multiple roles, the prefix changes at each role boundary — making the transition explicit even within a single session.
+- Outside formal cycles (informal questions, meta-conversation), no prefix is required. The prefix is a cycle-time signal, not a general convention.
+
+### Why this rule exists
+
+Without explicit role announcement:
+- The human cannot tell which agent is producing output
+- Silent role switches create cognitive confusion
+- Debugging protocol violations is harder
+
+With explicit role announcement:
+- The human sees the team working transparently (Art. 9 — Self-Observation)
+- Role switches are auditable
+- Cognitive load is reduced: the human always knows who is speaking
+
+---
+
+## Primary channel: the cycle record
 
 ---
 

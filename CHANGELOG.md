@@ -6,6 +6,28 @@ Format: `[version] — YYYY-MM-DD`
 
 ---
 
+## [0.2.1] — 2026-07-26
+
+### Added (operational rules — Article 11)
+
+- **Human interface rule**: the human operator always directs requests to the COORDINATOR (Agent 10),
+  which is the permanent entry point. Other agents are invoked by the COORDINATOR and their outputs
+  are shown directly to the human. Owner retains the right to escalate directly at any time.
+- **Explicit role announcement**: during operational cycles, every agent prefixes its output with
+  `[ROLE_NAME]:` in the chat or terminal, making agent transitions visible to the human operator.
+  Outside formal cycles, no prefix is required.
+
+### Updated
+
+- `ECOSYSTEM.md` — COORDINATOR mission: added "permanent human interface" responsibility;
+  Common Rules: added role announcement convention
+- `protocols/communication.md` — new "Human Interface" section + "Agent Invocation" section
+  with format, rules, and rationale
+- `instances/claude-code/CLAUDE.md` — "always start as COORDINATOR" rule; `[ROLE]` prefix
+  instructions for Claude Code during cycles
+
+---
+
 ## [0.2.0] — 2026-07-26
 
 ### Constitutional Amendment (Articles 16–18)
