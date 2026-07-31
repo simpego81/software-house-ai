@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<!--
+  SOFTWARE HOUSE AI — Milestone Animation Template v1.0
+  ─────────────────────────────────────────────────────
+  Standard: protocols/stakeholder-animation.md
+  Article:  Constitution Article 19 — Visual Communication for Stakeholders
+
+  HOW TO USE
+  1. Copy this file to your project's docs/ directory.
+  2. Fill in the PROJECT constant and the SCENES array below.
+  3. Open in any browser — no server, no build step.
+
+  SCENES ARRAY
+  Each scene object:
+    ms          — milestone ID shown in header (e.g. 'M1')
+    title       — display title
+    pill        — status class: 'pd' (done) | 'pa' (active) | 'pp' (planned)
+    badge       — status badge text (e.g. '⚡ IN CORSO')
+    annotCount  — number of annotation <g> elements in the SVG
+    svg()       — function returning the SVG string
+
+  SVG CONVENTIONS
+  - viewBox="0 0 1000 530" preserveAspectRatio="xMidYMid meet"
+  - Diagram elements: x 0–710
+  - Annotation column: x 720–995
+  - Annotation groups: id="ann-{sceneIndex}-{annotIndex}" class="ann" opacity="0"
+  - See protocols/stakeholder-animation.md for full spec and examples.
+
+  HELPER FUNCTIONS (available in svg() bodies)
+  - uNode(x,y,w,h,name,stereo,col,delay,inner)  — UML node box with stereotype
+  - art(x,y,w,name,col,delay)                   — artifact row inside a node
+  - cyl(x,y,w,h,name,col,delay)                 — database cylinder
+  - dl(x1,y1,x2,y2,col,delay,id)               — directed arrow (auto arrowhead)
+  - pkt(path,col,delay,dur)                     — animated data packet
+  - ann(si,ai,bx,by,bw,bh,col,title,lines,px1,py1,px2,py2) — annotation callout
+  - ap(delay,dur)                               — CSS appear animation attribute
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap — Software House AI</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#02060e;font-family:'Segoe UI',system-ui,sans-serif}
+#shell{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:92vw;height:94vh;
+  display:flex;flex-direction:column;background:#050c18;border:1px solid #162035;
+  border-radius:10px;box-shadow:0 0 80px #000c;overflow:hidden}
+#hdr{flex-shrink:0;height:46px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.4rem;background:#030810;border-bottom:1px solid #162035}
+.h-ms{font-size:.6rem;letter-spacing:.28em;color:#3b82f6;text-transform:uppercase;width:40px}
+.h-title{font-size:.95rem;font-weight:700;color:#f0f6ff;letter-spacing:.04em;flex:1;text-align:center}
+.h-ann{font-size:.68rem;color:#334155;letter-spacing:.06em;width:120px;text-align:right;margin-right:.6rem}
+.h-pill{font-size:.62rem;padding:.18rem .65rem;border-radius:10px;font-weight:600;letter-spacing:.05em;flex-shrink:0}
+.pd{background:#052e16;color:#4ade80;border:1px solid #166534}
+.pa{background:#1c1407;color:#fbbf24;border:1px solid #92400e;animation:pa 2s infinite}
+.pp{background:#1e1b4b;color:#a5b4fc;border:1px solid #3730a3}
+@keyframes pa{0%,100%{box-shadow:0 0 0 0 #fbbf2430}50%{box-shadow:0 0 0 5px transparent}}
+#diagram{flex:1;position:relative;overflow:hidden;display:flex;align-items:stretch;justify-content:stretch}
+.scene{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s}
+.scene.active{opacity:1;pointer-events:all}
+.scene svg{width:100%;height:100%}
+#nav{flex-shrink:0;height:38px;display:flex;align-items:center;justify-content:center;gap:.55rem;
+  background:#030810;border-top:1px solid #0e1c30}
+.nb{background:transparent;border:1px solid #1a2e4a;color:#3d5270;padding:.3rem .95rem;
+  border-radius:5px;font-size:.75rem;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.nb:hover{background:#1a2e4a;border-color:#3b82f6;color:#93c5fd}
+.nb:disabled{opacity:.15;cursor:not-allowed}
+.dot{width:7px;height:7px;border-radius:50%;background:#162035;cursor:pointer;transition:all .22s;border:none;flex-shrink:0}
+.dot.active{background:#3b82f6;width:22px;border-radius:3px;box-shadow:0 0 6px #3b82f680}
+.dot:hover{background:#2d4a7a}
+.ann{transition:opacity .3s}
+@keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes dl{from{stroke-dashoffset:var(--l,400)}to{stroke-dashoffset:0}}
+@keyframes pkt{0%{offset-distance:0%;opacity:0}8%{opacity:1}88%{opacity:1}100%{offset-distance:100%;opacity:0}}
+@keyframes fb{from{width:0}to{width:var(--w)}}
+#shell::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:900;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.022) 3px,rgba(0,0,0,.022) 4px);border-radius:10px}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="hdr">
+    <span class="h-ms" id="hMs"></span>
+    <span class="h-title" id="hTitle"></span>
+    <span class="h-ann" id="hAnn"></span>
+    <span class="h-pill" id="hPill"></span>
+  </div>
+  <div id="diagram"></div>
+  <div id="nav">
+    <button class="nb" id="bPrev">← Indietro</button>
+    <div id="dots" style="display:flex;gap:.45rem;align-items:center"></div>
+    <button class="nb" id="bNext">Avanti →</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  PROJECT IDENTITY — edit this
+// ═══════════════════════════════════════════════════════════════════════════
+const PROJECT = 'My Project';  // shown in browser title
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  HELPER FUNCTIONS — do not edit
+// ═══════════════════════════════════════════════════════════════════════════
+
+function ap(d=0, dur='.45') {
+  return `style="animation:appear ${dur}s ${d}s ease both;opacity:0"`;
+}
+
+function uNode(x, y, w, h, name, stereo, col, d, inner='') {
+  return `<g ${ap(d)}>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${col}0c" stroke="${col}" stroke-width="1.6"/>
+    <rect x="${x}" y="${y}" width="${w}" height="19" rx="3" fill="${col}1a" stroke="${col}" stroke-width="1.6"/>
+    <rect x="${x}" y="${y+16}" width="${w}" height="3" fill="${col}1a"/>
+    <text x="${x+w/2}" y="${y+7.5}" text-anchor="middle" font-size="6" fill="${col}99" letter-spacing=".14em">«${stereo}»</text>
+    <text x="${x+w/2}" y="${y+15}" text-anchor="middle" font-size="9.5" fill="${col}" font-weight="700">${name}</text>
+    ${inner}
+  </g>`;
+}
+
+function art(x, y, w, name, col, d) {
+  return `<g ${ap(d, '.35')}>
+    <rect x="${x}" y="${y}" width="${w}" height="16" rx="2" fill="${col}0e" stroke="${col}50" stroke-width="1"/>
+    <text x="${x+w/2}" y="${y+10.5}" text-anchor="middle" font-size="7.5" fill="${col}cc">${name}</text>
+  </g>`;
+}
+
+function cyl(x, y, w, h, name, col, d) {
+  return `<g ${ap(d, '.35')}>
+    <rect x="${x}" y="${y+6}" width="${w}" height="${h}" rx="2" fill="${col}0c" stroke="${col}48" stroke-width="1"/>
+    <ellipse cx="${x+w/2}" cy="${y+6}" rx="${w/2}" ry="5.5" fill="${col}18" stroke="${col}55" stroke-width="1"/>
+    <text x="${x+w/2}" y="${y+h/2+10}" text-anchor="middle" font-size="7.5" fill="${col}aa">${name}</text>
+  </g>`;
+}
+
+function dl(x1, y1, x2, y2, col, d=0, id='x') {
+  const len = Math.hypot(x2-x1, y2-y1);
+  const ang = Math.atan2(y2-y1, x2-x1);
+  const hx = x2 - 6*Math.cos(ang), hy = y2 - 6*Math.sin(ang);
+  return `<defs><marker id="ah${id}" markerWidth="5" markerHeight="4" refX="4" refY="2" orient="auto">
+    <polygon points="0,0 5,2 0,4" fill="${col}"/></marker></defs>
+    <line x1="${x1}" y1="${y1}" x2="${hx}" y2="${hy}" stroke="${col}" stroke-width="1.3" opacity=".6"
+      marker-end="url(#ah${id})" stroke-dasharray="${len}" stroke-dashoffset="${len}"
+      style="animation:dl .5s ${d}s ease both;--l:${len}"/>`;
+}
+
+function pkt(path, col, d, dur=2.4) {
+  return `<circle r="3.5" fill="${col}"
+    style="offset-path:path('${path}');animation:pkt ${dur}s ${d}s linear infinite"/>`;
+}
+
+// Annotation callout — always placed in the right annotation column (x ≥ 720)
+// si=sceneIndex, ai=annotIndex, bx/by=box position, bw/bh=box size
+// col=color, title=header text, lines=body lines (max 4)
+// px1/py1=pointer start (box edge), px2/py2=pointer end (element center)
+function ann(si, ai, bx, by, bw, bh, col, title, lines, px1, py1, px2, py2) {
+  const lid = `${si}-${ai}`;
+  const lineH = 12, ty = by + 14;
+  const linesHtml = lines.map((l, i) =>
+    `<text x="${bx+10}" y="${ty+14+i*lineH}" font-size="8" fill="#7a8fa8">${l}</text>`
+  ).join('');
+  return `<g id="ann-${lid}" class="ann" opacity="0">
+    <line x1="${px1}" y1="${py1}" x2="${px2}" y2="${py2}"
+      stroke="${col}" stroke-width="1" stroke-dasharray="5 3" opacity=".7"/>
+    <circle cx="${px2}" cy="${py2}" r="3" fill="${col}" opacity=".8"/>
+    <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="5"
+      fill="#060e1c" stroke="${col}" stroke-width="1.4"/>
+    <rect x="${bx}" y="${by}" width="${bw}" height="16" rx="5" fill="${col}18"/>
+    <rect x="${bx}" y="${by+13}" width="${bw}" height="3" fill="${col}18"/>
+    <text x="${bx+10}" y="${by+11}" font-size="7.5" fill="${col}" font-weight="700" letter-spacing=".1em">${title}</text>
+    ${linesHtml}
+  </g>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  SCENES — fill this in for your project
+//  Read protocols/stakeholder-animation.md before writing scenes.
+//  Primary sources: hardware_function_matrix.md, node-software-map.md,
+//                   node-deployment diagram, per-device views, roadmap.yaml
+// ═══════════════════════════════════════════════════════════════════════════
+const SCENES = [
+
+  // ── Example scene (replace with your project's milestones) ───────────────
+  {
+    ms: 'M0',
+    title: 'EXAMPLE MILESTONE',
+    pill: 'pd',          // 'pd' = done | 'pa' = active | 'pp' = planned
+    badge: '✓ DONE',
+    annotCount: 2,       // must match number of ann-{i}-{j} groups in svg()
+    svg() {
+      const W = 1000, H = 530;
+      // Diagram zone: x 0–710  |  Annotation column: x 720–995
+      return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+        <rect width="${W}" height="${H}" fill="#040a14"/>
+        <text x="12" y="17" font-size="7" fill="#1a2e4a" letter-spacing=".22em" font-weight="600">
+          DIAGRAM TITLE · M0
+        </text>
+
+        <!-- ── diagram elements ── -->
+        ${uNode(20, 60, 180, 100, 'Component A', 'service', '#3b82f6', .1,
+            art(30, 92, 80, 'Sub-service A1', '#3b82f6', .2) +
+            art(116, 92, 74, 'Sub-service A2', '#3b82f6', .25)
+        )}
+        ${uNode(260, 60, 180, 100, 'Component B', 'service', '#10b981', .15,
+            art(270, 92, 80, 'Sub-service B1', '#10b981', .25)
+        )}
+        ${dl(200, 110, 260, 110, '#3b82f6', .7, 'ex1')}
+        ${pkt('M200,110 L260,110', '#3b82f6', 1.5, 2)}
+
+        <!-- ── annotations (id must be ann-{sceneIndex}-{annotIndex}) ── -->
+        ${ann(0, 0,
+          720, 50, 265, 78,           // box: x, y, width, height
+          '#3b82f6',                  // color
+          'COMPONENT A',              // title
+          [                           // body lines (max 4)
+            'Description of Component A.',
+            'What it does and why it matters.',
+            'Which hardware or service runs it.',
+          ],
+          720, 89,                    // pointer start (box left edge)
+          110, 110                    // pointer end (element center)
+        )}
+        ${ann(0, 1,
+          720, 165, 265, 78,
+          '#10b981',
+          'COMPONENT B',
+          [
+            'Description of Component B.',
+            'Its role in the system.',
+            'Dependencies and interfaces.',
+          ],
+          720, 204,
+          350, 110
+        )}
+      </svg>`;
+    }
+  },
+
+  // Add more scenes here following the same pattern.
+  // See tr4d3rz-docs/docs/milestone-animation.html for real examples.
+
+]; // END SCENES
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ENGINE — do not edit below this line
+// ═══════════════════════════════════════════════════════════════════════════
+document.title = `Roadmap — ${PROJECT}`;
+
+const diagramEl = document.getElementById('diagram');
+const dotsEl    = document.getElementById('dots');
+let cur = 0, annotStep = -1;
+
+SCENES.forEach((sc, i) => {
+  const div = document.createElement('div');
+  div.className = 'scene'; div.id = `sc${i}`;
+  div.innerHTML = sc.svg();
+  diagramEl.appendChild(div);
+  const dot = document.createElement('button');
+  dot.className = 'dot'; dot.title = sc.ms;
+  dot.onclick = () => jumpScene(i);
+  dotsEl.appendChild(dot);
+});
+
+function getAnn(si, ai)  { return document.querySelector(`#sc${si} #ann-${si}-${ai}`); }
+function showAnn(si, ai) { const el = getAnn(si,ai); if (el) el.style.opacity = '1'; }
+function hideAnn(si, ai) { const el = getAnn(si,ai); if (el) el.style.opacity = '0'; }
+function hideAllAnns(si) { for (let i=0; i<SCENES[si].annotCount; i++) hideAnn(si,i); }
+
+function updateHeader() {
+  const sc = SCENES[cur];
+  document.getElementById('hMs').textContent    = sc.ms;
+  document.getElementById('hTitle').textContent = sc.title;
+  const pill = document.getElementById('hPill');
+  pill.textContent = sc.badge; pill.className = `h-pill ${sc.pill}`;
+  document.getElementById('hAnn').textContent =
+    annotStep >= 0 ? `nota ${annotStep+1} / ${sc.annotCount}` : '→ per le note';
+}
+
+function goScene(idx) {
+  document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+  document.getElementById(`sc${idx}`).classList.add('active');
+  cur = idx; annotStep = -1;
+  updateHeader();
+  document.getElementById('bPrev').disabled = idx===0;
+  document.getElementById('bNext').disabled = false;
+}
+
+function jumpScene(idx) {
+  hideAllAnns(cur);
+  goScene(idx);
+}
+
+function next() {
+  const sc = SCENES[cur];
+  if (annotStep < sc.annotCount - 1) {
+    if (annotStep >= 0) hideAnn(cur, annotStep);
+    annotStep++;
+    showAnn(cur, annotStep);
+    updateHeader();
+    document.getElementById('bPrev').disabled = false;
+    document.getElementById('bNext').disabled =
+      annotStep === sc.annotCount-1 && cur === SCENES.length-1;
+  } else if (cur < SCENES.length-1) {
+    hideAllAnns(cur);
+    goScene(cur+1);
+  }
+}
+
+function prev() {
+  if (annotStep > 0) {
+    hideAnn(cur, annotStep); annotStep--;
+    showAnn(cur, annotStep); updateHeader();
+    document.getElementById('bNext').disabled = false;
+  } else if (annotStep === 0) {
+    hideAnn(cur, 0); annotStep = -1; updateHeader();
+    document.getElementById('bPrev').disabled = cur===0;
+  } else if (cur > 0) {
+    goScene(cur-1);
+    const sc = SCENES[cur];
+    annotStep = sc.annotCount-1;
+    showAnn(cur, annotStep); updateHeader();
+  }
+}
+
+document.getElementById('bNext').onclick = next;
+document.getElementById('bPrev').onclick = prev;
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight') { e.preventDefault(); next(); }
+  if (e.key==='ArrowLeft')  { e.preventDefault(); prev(); }
+});
+
+goScene(0);
+</script>
+</body>
+</html>

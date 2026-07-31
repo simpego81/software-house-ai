@@ -108,6 +108,23 @@ Navigation note: <any non-obvious path to find additional context>
 
 ---
 
+## Stakeholder Animation Artifact
+
+The Librarian is responsible for ensuring that every project maintains a `docs/milestone-animation.html` following the standard defined in [`protocols/stakeholder-animation.md`](../protocols/stakeholder-animation.md) (Constitution Article 19).
+
+**Trigger for creation:** First milestone formally defined in `state/roadmap.yaml`.  
+**Trigger for update:** New milestone added, hardware topology changed, milestone status changes to COMPLETED.  
+**Template:** [`../templates/milestone-animation.html`](../templates/milestone-animation.html) — fork this, fill in `SCENES`.
+
+The Librarian issues a DWO (type `ANI`) using the template in `protocols/stakeholder-animation.md §DWO template`.
+
+**Verification mandate:** Before closing a DWO for this artifact, the Librarian confirms:
+- All hardware nodes from `hardware_function_matrix.md` are visible in the animation
+- Navigation is user-controlled (no auto-advance)
+- Annotations appear near their elements, not in a separate panel
+
+---
+
 ## Diagram Guarantee
 
 The Librarian is the sole guarantor that diagrams exist, are current, and are consistent with the system as built. This covers two diagram families:

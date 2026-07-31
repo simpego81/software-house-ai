@@ -230,6 +230,25 @@ If no agent opens the commission, the responsibility falls to the Evolution Mast
 
 ---
 
+## Article 19 — Visual Communication for Stakeholders
+
+Stakeholder communication must be visual by default.
+
+Any project that defines milestones must produce a visual presentation artifact that:
+
+- Shows system topology, component interactions, and data flows as diagrams — not as text
+- Allows stakeholders to navigate the content at their own pace — no auto-advance
+- Annotates each element individually, one annotation at a time, positioned near the element
+- Uses UML or ArchiMate diagram conventions — not slides with bullet points
+
+A presentation artifact that a non-technical stakeholder cannot understand without reading text has failed its purpose.
+
+This article does not prescribe technology. It prescribes the communication contract: **diagrams first, text as annotation, navigation by the viewer**.
+
+The Librarian is responsible for ensuring this artifact exists and is current. See [`protocols/stakeholder-animation.md`](protocols/stakeholder-animation.md).
+
+---
+
 ## Ecosystem Motto
 
 > "Ideas compete. Knowledge cooperates. The ecosystem evolves."
