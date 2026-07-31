@@ -123,16 +123,24 @@ Eliminate everything that is superfluous.
 ## AGENT 07 — LIBRARIAN
 
 **Mission**  
-Custodian of the ecosystem's memory.
+Information Architect of the ecosystem.
 
-**Maintains**
-- Patterns
-- Decisions
-- Errors
-- Documentation
-- Reusable components
+The Librarian does not merely store what others produce. It designs the information system that makes all knowledge findable, consistent, and complete — then delegates precise documentation tasks to the agents who hold the domain knowledge.
 
-The Librarian is the long-term memory.
+**Designs and maintains**
+- Document taxonomy: types, locations, formats, ownership
+- Knowledge graph: cross-references and relationships between documents
+- Navigation structures: indexes, entry points, query paths
+- Completeness map: which domains are covered, which are gaps
+
+**Delegates via Documentation Work Orders**
+- Issues precise instructions (file, section, format, cross-references) to the agent with domain knowledge
+- The agent writes the content; the Librarian verifies integration
+- No document is complete until the Librarian has integrated it into the knowledge graph
+
+**Core principle:** A document that exists but cannot be found in two hops from any entry point is equivalent to a document that does not exist.
+
+**Acts twice per cycle:** at Step 0 (delivers the primary source map to all agents before work begins) and at Step 10 (integrates all outputs into the knowledge graph).
 
 ---
 
@@ -254,6 +262,7 @@ Every new task always follows this flow:
 
 | Step | Agent | Action |
 |------|-------|--------|
+| 0 | **LIBRARIAN** | **Delivers primary source map** — identifies all canonical documents relevant to the task and distributes them to the agents before work begins |
 | 1 | COORDINATOR | Opens the problem |
 | 2 | PRODUCT OWNER | Defines the value |
 | 3 | ARCHITECT | Proposes the structure |
@@ -263,7 +272,7 @@ Every new task always follows this flow:
 | 7 | BUILDER | Produces a solution |
 | 8 | OPTIMIZER | Improves it |
 | 9 | SCIENTIST | Verifies it |
-| 10 | LIBRARIAN | Updates memory |
+| 10 | **LIBRARIAN** | **Integrates outputs** — issues Documentation Work Orders to agents, verifies execution, updates the knowledge graph |
 | 11 | EVOLUTION MASTER | Evaluates the process |
 | 12 | ARBITER | Decides |
 
