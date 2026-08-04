@@ -249,6 +249,26 @@ The Librarian is responsible for ensuring this artifact exists and is current. S
 
 ---
 
+## Article 20 — Independent Completion Verification
+
+Every deliverable must be verified by an agent who did not produce it before being declared complete.
+
+The verifier's mandate is adversarial: find what is missing or unclear to someone with no prior context — not what is present and functioning.
+
+The verification method is domain-specific:
+
+- **Interactive/UI**: outsider-perspective completeness review — "what does this element mean to someone who has never seen it?"
+- **Compiled software**: integration test driven by a verifier other than the developer
+- **Embedded**: hardware-in-loop or equivalent simulation driven by a verifier other than the firmware author
+- **Documentation**: comprehension check by a reader who was not involved in writing it
+- **Protocols/APIs**: integration attempt by a consumer who did not design the interface
+
+If no domain-specific verification method is defined for the deliverable type, the verifier must state: "verification method undefined — deliverable is PROVISIONAL, not DONE." A PROVISIONAL deliverable may not be declared DONE until a verification method is agreed.
+
+This article does not prescribe who the verifier must be. Any agent may serve as verifier. The SCIENTIST is the natural choice in most contexts; domain playbooks in `protocols/` specify the appropriate verifier per deliverable type.
+
+---
+
 ## Ecosystem Motto
 
 > "Ideas compete. Knowledge cooperates. The ecosystem evolves."
