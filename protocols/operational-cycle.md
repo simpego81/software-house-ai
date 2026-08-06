@@ -138,6 +138,21 @@ If verification is not possible at this stage, the Scientist must state why and 
 
 **Frontend deliverables**: for any solution whose output is HTML, JavaScript, WebGL, or a browser-rendered artifact, logical inspection alone does **not** satisfy this step. The required method is **browser observation** — open the deliverable in a browser and directly confirm visual rendering and absence of console errors. See [protocols/frontend-checklist.md](frontend-checklist.md).
 
+**Production deployment targets**: for any cycle that includes a deployment, the Scientist must produce one entry per configured target:
+
+```
+Target: <name>
+Reachable by automation: YES / NO
+Verification method: <how confirmed>
+Status: VERIFIED | PENDING_HUMAN | SKIPPED_JUSTIFIED
+```
+
+- `VERIFIED`: automation confirmed the running artifact matches the expected commit/version.
+- `PENDING_HUMAN`: target is unreachable by automation. The Scientist has produced exact verification commands and expected output (see project `CLAUDE.md` for per-target procedures). Status becomes `VERIFIED` only after the named human operator confirms.
+- `SKIPPED_JUSTIFIED`: deployment was explicitly out of scope for this cycle; justification required.
+
+Any `PENDING_HUMAN` entry makes the deliverable **provisional** (Article 16). The Arbiter may not issue ACCEPTED until it is resolved (see Step 12).
+
 ---
 
 ### Step 10 — LIBRARIAN: Update Memory
@@ -174,6 +189,10 @@ The Evolution Master does not evaluate the solution — it evaluates the process
 - If ESCALATED: why Owner intervention is required
 
 The Arbiter evaluates quality, evidence, and consensus. It does not create or implement.
+
+**Constraints on ACCEPTED:**
+- If Step 9 contains any target with status `PENDING_HUMAN`: the Arbiter **must** issue DEFERRED, not ACCEPTED. The DEFERRED condition must name: the target, the verification commands, the human owner, and the method for recording confirmation.
+- If a DEFERRED decision is issued, the condition must include an explicit method for re-opening the cycle (not just "check later"). A DEFERRED without a re-opening mechanism is constitutionally equivalent to abandonment.
 
 **The Arbiter's decision closes the cycle.**
 

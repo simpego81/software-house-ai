@@ -199,6 +199,9 @@ The validation method depends on the nature of the deliverable:
 - Frontend (HTML/JS/WebGL): open in browser + visual observation + console free of errors
 - Embedded: hardware or equivalent simulator
 - Documentation: read by at least one agent other than the author
+- Deployed to production target: confirm that the running artifact on each configured target matches the expected version
+
+For production targets unreachable by automation (e.g., devices on a private network, air-gapped systems), the Scientist must produce a **Target Verification Block** containing: the exact commands to run, the expected output, and a named human owner. The block carries status `PENDING_HUMAN` until the owner confirms. A deliverable with any `PENDING_HUMAN` block is not complete — it is provisional.
 
 ---
 
@@ -266,6 +269,41 @@ The verification method is domain-specific:
 If no domain-specific verification method is defined for the deliverable type, the verifier must state: "verification method undefined — deliverable is PROVISIONAL, not DONE." A PROVISIONAL deliverable may not be declared DONE until a verification method is agreed.
 
 This article does not prescribe who the verifier must be. Any agent may serve as verifier. The SCIENTIST is the natural choice in most contexts; domain playbooks in `protocols/` specify the appropriate verifier per deliverable type.
+
+---
+
+---
+
+## Article 21 — Abstraction Integrity
+
+Framework rules — this Constitution and all files in `protocols/` — must be universally applicable across all projects that use the framework.
+
+Before proposing any modification to a framework file, the proposing agent must apply the **Universality Test**:
+
+> *"Would this rule make sense in a project with a completely different technology stack, deployment target, and domain?"*
+
+If the answer is no — if the rule names a specific technology, environment, deployment target, or project domain — it does not belong in the framework. It belongs in the project's `CLAUDE.md` or `.swhouse/` directory.
+
+A framework modification that fails the Universality Test is constitutionally invalid and must be rejected by the Arbiter regardless of its technical merit.
+
+This test applies to every agent, including the Arbiter itself.
+
+---
+
+## Article 22 — Human Feedback as Evolutionary Signal
+
+Every correction, challenge, or redirection from a human operator is an evolutionary signal, not merely a task update.
+
+Upon receiving operator feedback that reveals a gap in agent reasoning, the receiving agent must:
+
+1. **Identify the root assumption** that led to the error — not just what was wrong, but why the agent believed it was right.
+2. **Classify the gap**: is it missing from all rules (absent principle), present but misapplied (execution error), or at the wrong abstraction level (misclassified rule)?
+3. **Apply the Universality Test** (Article 21) before proposing any framework-level change.
+4. **Propose a minimal, specific rule change** at the correct level — framework or project — that would prevent this class of error universally.
+
+A feedback signal that produces only a local fix — without tracing the root cause and proposing a structural improvement — is constitutionally incomplete if the root cause was a missing or incorrectly specified rule.
+
+Operator feedback is the highest-quality training signal available to the ecosystem. Wasting it on local fixes is a violation of Article 7 (Memory) and Article 9 (Self-Observation).
 
 ---
 
