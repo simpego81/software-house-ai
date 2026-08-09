@@ -307,6 +307,28 @@ Operator feedback is the highest-quality training signal available to the ecosys
 
 ---
 
+## Article 23 — Real-Time Failure Logging
+
+Every failure encountered by any agent during any session must be recorded in `memory/errors/` before the session ends.
+
+"Failure" includes:
+
+- Any command, connection, or operation that does not produce its expected result
+- Any unexpected system state discovered during operation
+- Any deviation from expected behavior, regardless of whether a workaround was found immediately
+
+The record must be created at the time of occurrence — not at Step 10, not at cycle close, not in the next session.
+
+A failure logged after the fact is a reconstruction, not a record. Reconstructions lose information: the sequence of attempts, the context at the time, the hypotheses formed and discarded. Only contemporaneous records preserve this information.
+
+The minimum viable record contains: what was attempted and what was observed. It may be incomplete in its analysis — it must exist as evidence.
+
+A failure not logged within the same session is evidence permanently lost.
+
+The ecosystem cannot learn from failures it cannot see.
+
+---
+
 ## Ecosystem Motto
 
 > "Ideas compete. Knowledge cooperates. The ecosystem evolves."

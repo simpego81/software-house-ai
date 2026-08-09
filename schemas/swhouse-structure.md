@@ -115,28 +115,40 @@ When this pattern does not apply.
 
 Documents a failure, its cause, and the lesson extracted.
 
+Per Article 23 (Real-Time Failure Logging), entries must be created at the time the failure occurs. Analysis fields may be left `pending` at initial logging and completed by the LIBRARIAN at Step 10.
+
 ```markdown
 ---
 date: YYYY-MM-DD
-cycle: NNN
+cycle: NNN | outside-cycle
 severity: low | medium | high | critical
+occurred_at: YYYY-MM-DDTHH:MM    # when the failure happened (required)
+logged_at: YYYY-MM-DDTHH:MM      # when this entry was created (required; must be same session as occurred_at per Article 23)
 ---
 
-## What failed
-Description of the failure.
+## What was attempted
+The operation that was being performed when the failure occurred.
+
+## What was observed
+The actual error, output, or unexpected state. Quote exact messages where possible.
 
 ## Root cause
-Analysis of what caused it.
+Analysis of what caused it. May be "unknown — investigation pending" at time of initial logging.
 
 ## How it was detected
-At what step and by which agent.
+At what step and by which agent, or the out-of-cycle context.
 
 ## Resolution
-How it was corrected.
+How it was corrected. May be "pending" at time of initial logging.
 
 ## Lesson
-The extractable, reusable knowledge.
+The extractable, reusable knowledge. May be completed in Step 10 if not known at time of logging.
+
+## Related
+Links to related errors, decisions, patterns, or cycle entries.
 ```
+
+Note: `## Root cause`, `## Resolution`, and `## Lesson` may be incomplete at initial logging. The obligation (Article 23) is to create the entry immediately; the obligation for completeness belongs to the LIBRARIAN (Step 10).
 
 ---
 

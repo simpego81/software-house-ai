@@ -259,3 +259,40 @@ See [schemas/swhouse-structure.md](../schemas/swhouse-structure.md#cyclescurrent
 Cycles are numbered sequentially from 001, zero-padded to 3 digits. The number is global to the project — it does not reset per milestone or version.
 
 `metrics/summary.yaml` is the authoritative source for the last cycle number.
+
+---
+
+## Real-Time Failure Logging Protocol
+
+This is not a cycle step. It is a continuous obligation binding every agent in every session, inside or outside a formal cycle.
+
+### Trigger conditions
+
+Log immediately when any of the following occurs:
+
+- A shell command, network connection, or API call returns an error or unexpected output
+- A service, process, or resource is found in a state different from what was expected
+- An operation produces no output when output was expected
+- An assumption stated earlier in the session is contradicted by observation
+- Multiple attempts are made at the same operation (retries signal an unresolved failure)
+
+### What to log
+
+Create or append to `memory/errors/YYYY-MM-DD-descriptive-title.md` (one file per session or per incident cluster).
+
+**Minimum required fields** — completeness is for Step 10; existence is for now:
+
+```
+occurred_at: <time or "approx HH:MM">
+what was attempted: <one line>
+what was observed: <the actual error, output, or state>
+cycle: <NNN or "outside cycle">
+```
+
+Analysis (`root cause`, `resolution`, `lesson`) may be left as `pending`. A partial entry is better than no entry.
+
+### What this is not
+
+- It is not a replacement for Step 10 (LIBRARIAN). Step 10 enriches and links entries; this protocol creates them.
+- It is not optional when a workaround is found quickly. A failure that was immediately resolved is still evidence: it reveals an assumption that was wrong, an environment that differs from expectations, or a gap in pre-conditions.
+- It is not deferred because the session is busy. The log entry takes seconds; the lost evidence costs future sessions hours.
