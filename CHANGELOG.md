@@ -6,6 +6,26 @@ Format: `[version] — YYYY-MM-DD`
 
 ---
 
+## [0.3.0] — 2026-08-11
+
+### Added (constitutional amendment — Article 12)
+
+- **Article 24 — Validation Infrastructure Ownership**: introduces the VALIDATOR role as a standing infrastructure agent. Every instance must maintain a validation matrix covering all deployment targets. No deliverable may be validated only on localhost when real targets exist.
+- **AGENT 13 — VALIDATOR** in `ECOSYSTEM.md`: role definition, responsibilities, and invocation points.
+
+### Updated (operational rules — Article 11)
+
+- **Step 1 (COORDINATOR)**: must verify the validation matrix covers all targets affected by the cycle before proceeding to Step 7.
+- **Step 9 (SCIENTIST)**: must read from the VALIDATOR matrix; localhost validation does not substitute a real-target entry.
+- **Step 10 (LIBRARIAN)**: must update the validation matrix if infrastructure changed during the cycle.
+- **Missing Roles table**: added VALIDATOR with High criticality and fallback procedure.
+
+### Motivation
+
+Retrospective from Consilium Cycle 4: a frontend deliverable was validated on localhost only. The Pi target — the only one with real data — was not validated. Root cause: no agent owned the validation configuration. The VALIDATOR role closes this gap at the constitutional level.
+
+---
+
 ## [0.2.1] — 2026-07-26
 
 ### Added (operational rules — Article 11)

@@ -36,6 +36,7 @@ OPEN → [12 steps] → CLOSE → ARCHIVE
 - Why it is being addressed now
 - Scope boundaries (what is in and out of scope)
 - Estimated complexity: Low | Medium | High
+- **Validation matrix check:** if the cycle involves a deployment or a user-facing deliverable, verify that the VALIDATOR matrix covers all affected targets. If any target is missing, invoke the VALIDATOR before proceeding to Step 7 and record the gap.
 
 The Coordinator does not propose solutions. It frames the problem.
 
@@ -138,18 +139,20 @@ If verification is not possible at this stage, the Scientist must state why and 
 
 **Frontend deliverables**: for any solution whose output is HTML, JavaScript, WebGL, or a browser-rendered artifact, logical inspection alone does **not** satisfy this step. The required method is **browser observation** — open the deliverable in a browser and directly confirm visual rendering and absence of console errors. See [protocols/frontend-checklist.md](frontend-checklist.md).
 
-**Production deployment targets**: for any cycle that includes a deployment, the Scientist must produce one entry per configured target:
+**Production deployment targets**: for any cycle that includes a deployment, the Scientist must read the VALIDATOR matrix and produce one entry per target listed in it:
 
 ```
 Target: <name>
 Reachable by automation: YES / NO
-Verification method: <how confirmed>
+Verification method: <how confirmed — from VALIDATOR matrix>
 Status: VERIFIED | PENDING_HUMAN | SKIPPED_JUSTIFIED
 ```
 
 - `VERIFIED`: automation confirmed the running artifact matches the expected commit/version.
-- `PENDING_HUMAN`: target is unreachable by automation. The Scientist has produced exact verification commands and expected output (see project `CLAUDE.md` for per-target procedures). Status becomes `VERIFIED` only after the named human operator confirms.
+- `PENDING_HUMAN`: target is unreachable by automation. The Scientist has produced exact verification commands and expected output (see VALIDATOR matrix and project `CLAUDE.md` for per-target procedures). Status becomes `VERIFIED` only after the named human operator confirms.
 - `SKIPPED_JUSTIFIED`: deployment was explicitly out of scope for this cycle; justification required.
+
+**The SCIENTIST must not substitute localhost validation for a real-target entry.** A target listed in the VALIDATOR matrix that is validated only on localhost produces a SKIPPED entry, not VERIFIED.
 
 Any `PENDING_HUMAN` entry makes the deliverable **provisional** (Article 16). The Arbiter may not issue ACCEPTED until it is resolved (see Step 12).
 
@@ -162,6 +165,7 @@ Any `PENDING_HUMAN` entry makes the deliverable **provisional** (Article 16). Th
 - Existing entries updated or superseded
 - Links between this cycle and related past cycles
 - Summary: what is now reusable from this cycle?
+- **Validation matrix update:** if the cycle added, removed, or modified any deployment target, credential, or verification procedure, the VALIDATOR matrix must be updated before this step is marked complete.
 
 The Librarian's work is not optional. A cycle that leaves no memory entry is constitutionally incomplete (Article 10).
 
@@ -245,6 +249,7 @@ If a role listed in the operational protocol is not available:
 | LIBRARIAN | High | Builder writes memory entries; Coordinator schedules Librarian catch-up |
 | EVOLUTION MASTER | Low | Step 11 is skipped |
 | ARBITER | Critical | Pause cycle, notify Owner |
+| VALIDATOR | High | Scientist documents targets from CLAUDE.md manually; Coordinator flags matrix as provisional |
 
 ---
 

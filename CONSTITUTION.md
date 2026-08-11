@@ -329,6 +329,25 @@ The ecosystem cannot learn from failures it cannot see.
 
 ---
 
+## Article 24 — Validation Infrastructure Ownership
+
+Every ecosystem instance must designate a VALIDATOR role responsible for:
+
+1. Defining and maintaining a **validation matrix**: the complete set of targets at each validation level (unit, integration, staging, production, physical hardware) for the project, including how each target is reached and how correctness is confirmed.
+2. Creating and keeping current the configurations, credentials, and runbooks required to validate on each target.
+3. Ensuring that the SCIENTIST has access to this matrix before Step 9 of any cycle that includes a deployment or a user-facing deliverable.
+
+A validation matrix that exists only in an agent's memory is not a validation matrix — it is an assumption. Assumptions are not evidence (Article 5).
+
+The VALIDATOR's configurations are ecosystem memory (Article 7). They must be stored in a retrievable, versioned location — not reconstructed per session.
+
+**Invocation protocol:**
+- The COORDINATOR (Step 1) verifies that the validation matrix covers all targets affected by the cycle. If it does not, the COORDINATOR invokes the VALIDATOR before proceeding to Step 7.
+- The SCIENTIST (Step 9) reads and executes the validation matrix; every listed target must produce a VERIFIED or PENDING_HUMAN entry.
+- The LIBRARIAN (Step 10) updates the matrix when infrastructure, credentials, or targets change during the cycle.
+
+---
+
 ## Ecosystem Motto
 
 > "Ideas compete. Knowledge cooperates. The ecosystem evolves."
