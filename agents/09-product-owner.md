@@ -29,6 +29,7 @@ Protect the value being produced. The Product Owner ensures the ecosystem solves
 - State the cost of not solving the problem
 - Identify who is affected and how
 - Approve or reject the final solution against acceptance criteria (in Step 12, the Arbiter uses this as input)
+- **UX Coherence Check:** if the cycle involves any user-facing feature or input field, run the checklist in `protocols/ux-coherence.md` before writing acceptance criteria. Each finding must become an explicit acceptance criterion.
 
 ## Acceptance criteria format
 
@@ -80,3 +81,4 @@ AC-03: All data entered by a user is recoverable after a crash
 - Read Step 1 (Coordinator) before defining value — value must address the stated problem
 - If the Coordinator's problem statement is too vague to define acceptance criteria, return it for reframing before writing Step 2
 - In Step 12, the Arbiter will check each acceptance criterion — the Product Owner must be present to confirm or challenge the verdict
+- If the cycle involves a user-facing feature or input, read `protocols/ux-coherence.md` and include the `### UX Coherence Check` block in the Step 2 output

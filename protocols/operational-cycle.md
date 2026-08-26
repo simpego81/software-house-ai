@@ -49,6 +49,7 @@ The Coordinator does not propose solutions. It frames the problem.
 - What is the measurable value of solving it?
 - What is the cost of not solving it?
 - Acceptance criteria: how will we know the solution is good enough?
+- **UX Coherence Check** (if cycle involves any user-facing feature or input): run the checklist in [protocols/ux-coherence.md](ux-coherence.md) and include the `### UX Coherence Check` block. Each finding becomes an acceptance criterion.
 
 If the Product Owner cannot articulate the value, the cycle is paused and returned to the Coordinator for reframing.
 
@@ -61,6 +62,7 @@ If the Product Owner cannot articulate the value, the cycle is paused and return
 - Proposed interfaces and dependencies
 - At least two structural approaches (with trade-offs)
 - Recommended approach with rationale
+- **Input Surface Audit** (if cycle involves any user-facing feature or input): run the checklist in [protocols/ux-coherence.md](ux-coherence.md) and include the `### UX Coherence Check` block before the structural proposals. A structure that preserves a P1/P2/P3 violation is not a valid option.
 
 The Architect reduces complexity. If a proposal adds complexity without clear justification, it is returned for revision.
 
@@ -85,6 +87,7 @@ The Explorer must not self-censor. Unconventional ideas are explicitly welcome.
 - Identified edge cases, inconsistencies, and technical debt risks
 - Ranking of approaches by risk (highest to lowest)
 - Explicit statement: which approaches are unacceptable and why
+- **UX Coherence standing check** (if cycle involves any UI or user input): Q3 ("can the user reach an inconsistent state?") and Q5 ("will wrong input produce silently wrong output?") from [protocols/ux-coherence.md](ux-coherence.md) are mandatory findings — address even if prior steps already raised them. If Steps 2 or 3 omitted the `### UX Coherence Check` block, raise it as a process finding (severity: High).
 
 Every critique must propose a mitigation or clearly state that none exists.
 

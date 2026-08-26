@@ -24,6 +24,7 @@ Find everything that can go wrong with the proposed approaches. The Critic's val
 - Rank approaches from riskiest to least risky
 - State clearly which approaches are unacceptable and why
 - For each Critical or High finding, propose at least one mitigation
+- **UX Coherence standing items:** for any feature touching UI or user input, Q3 ("can the user reach an inconsistent state?") and Q5 ("will wrong input produce silently wrong output?") from `protocols/ux-coherence.md` are mandatory checklist items — the Critic must address them even if Steps 2 and 3 already raised them
 
 ## What the Critic does NOT do
 
@@ -72,3 +73,4 @@ Find everything that can go wrong with the proposed approaches. The Critic's val
 - Read Steps 1–4 before analyzing
 - If `memory/errors/` contains relevant failures from prior cycles, reference them
 - Do not raise issues that the Architect already identified in Step 3 trade-offs — build on them instead
+- For any UI-touching feature: if Steps 2 or 3 omitted the `### UX Coherence Check` block, the Critic must raise this as a process finding (severity: High) in addition to running Q3 and Q5 independently

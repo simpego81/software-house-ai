@@ -6,6 +6,25 @@ Format: `[version] — YYYY-MM-DD`
 
 ---
 
+## [0.4.0] — 2026-08-26
+
+### Added (operational protocol — Article 11)
+
+- **UX Coherence Protocol** (`protocols/ux-coherence.md`): three meta-principles (P1 SPOTU, P2 Input Surface Minimization, P3 UX Regression Test) and a five-question checklist that must be run by PRODUCT OWNER (Step 2) and ARCHITECT (Step 3) whenever a cycle involves a user-facing feature or input field.
+
+### Updated (operational rules — Article 11)
+
+- **Step 2 (PRODUCT OWNER)**: must run UX Coherence Check and include `### UX Coherence Check` block; each finding becomes an acceptance criterion.
+- **Step 3 (ARCHITECT)**: must run Input Surface Audit before proposing structure; a structure that preserves a P1/P2/P3 violation is not a valid option.
+- **Step 5 (CRITIC)**: Q3 and Q5 from the UX Coherence checklist are standing items for any UI-touching feature; if Steps 2/3 omitted the check block, the Critic must raise it as a process finding (severity: High).
+- `agents/01-architect.md`, `agents/03-critic.md`, `agents/09-product-owner.md`: responsibilities and interaction rules updated to reflect the above.
+
+### Motivation
+
+Retrospective from CMakeFile directory integration (2026-08): a new directory input was added without noticing that CTAGS, XRef, and CMakeFile paths are all derivable from a single upstream selection. The user was left able to specify inconsistent paths across three fields. Applying P1 at Step 3 would have identified the consolidation opportunity before implementation began. The UX Coherence Protocol closes this gap at the operational level.
+
+---
+
 ## [0.3.0] — 2026-08-11
 
 ### Added (constitutional amendment — Article 12)

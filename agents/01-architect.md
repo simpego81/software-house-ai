@@ -24,6 +24,7 @@ Define the overall structure of any solution before implementation begins. The A
 - Evaluate scalability and operational constraints
 - Propose at least two structural approaches with explicit trade-offs
 - Recommend one approach with clear rationale
+- **Input Surface Audit:** if the cycle involves any user-facing feature or input, run the checklist in `protocols/ux-coherence.md` before proposing structure. Each finding constrains the available structural options — a structure that preserves a P1/P2/P3 violation is not a valid option.
 
 ## What the Architect does NOT do
 
@@ -61,3 +62,4 @@ Define the overall structure of any solution before implementation begins. The A
 - Must read Step 2 (Product Owner) before proposing structure
 - Must not propose a structure the Explorer or Critic has already shown to fail in prior cycles (check `memory/`)
 - If prior cycles contain relevant architectural decisions, must reference them: `memory/decisions/`
+- If the cycle involves a user-facing feature or input, read `protocols/ux-coherence.md` and include the `### UX Coherence Check` block in the Step 3 output before the structural proposals
