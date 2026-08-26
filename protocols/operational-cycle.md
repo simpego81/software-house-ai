@@ -1,6 +1,6 @@
 # Operational Cycle Protocol
 
-**Version:** 1.0
+**Version:** 1.1
 
 The operational cycle is the fundamental unit of work in the Software House AI. Every problem, feature, decision, or investigation is processed through this protocol.
 
@@ -11,6 +11,22 @@ The operational cycle is the fundamental unit of work in the Software House AI. 
 A cycle consists of 12 sequential steps, each owned by one of the founding agents. The cycle produces a documented decision and updates the organizational memory.
 
 **One cycle is open at a time.** Concurrent cycles are not permitted in the current version.
+
+---
+
+## Cycle Tracks
+
+The COORDINATOR selects a track at Step 1 and records it in the cycle header (`**Track:**`).
+
+| Track | Steps executed | When to use |
+|-------|---------------|-------------|
+| S — Sprint | 1 · 7 · 9 · 12 | Hotfixes, single-component changes where design is already settled |
+| M — Standard | 1 · 2 · 3 · 5 · 7 · 8 · 9 · 10 · 11 · 12 | Feature work with design to be decided |
+| F — Full | All 12 | Architectural decisions, new modules, cross-cutting changes, self-assessment |
+
+In Track S, skipped steps are not present in `current.md` — they are out of scope by design, not bypassed.  
+In Track M, Steps 4 (Explorer) and 6 (Destroyer) are optional: include them if the problem space is novel or adversarial risk is relevant.  
+In all tracks, Steps 10 (Librarian) and 11 (Evolution Master) are required.
 
 ---
 
@@ -32,11 +48,14 @@ OPEN → [12 steps] → CLOSE → ARCHIVE
 ### Step 1 — COORDINATOR: Open the Problem
 
 **Output required:**
+- Track selection: **S | M | F** with one-line justification
 - Clear statement of the problem
 - Why it is being addressed now
 - Scope boundaries (what is in and out of scope)
 - Estimated complexity: Low | Medium | High
-- **Validation matrix check:** if the cycle involves a deployment or a user-facing deliverable, verify that the VALIDATOR matrix covers all affected targets. If any target is missing, invoke the VALIDATOR before proceeding to Step 7 and record the gap.
+- **Context check:**
+  - Memory lookup: list any `memory/` entries consulted relevant to this cycle's domain (or state "no prior entries in this domain")
+  - Validation matrix: if the cycle involves a deployment or a user-facing deliverable, confirm the VALIDATOR matrix covers all affected targets; if missing, invoke VALIDATOR before Step 7
 
 The Coordinator does not propose solutions. It frames the problem.
 
@@ -73,7 +92,7 @@ The Architect reduces complexity. If a proposal adds complexity without clear ju
 **Output required:**
 - At least three alternative approaches (divergent thinking)
 - At least one approach that challenges the Architect's recommendation
-- One approach derived from analogy or biomimicry
+- One approach that starts from a different first principle than the Architect's — a genuinely different framing of the problem, not a variation of the same solution
 - Brief rationale for each
 
 The Explorer must not self-censor. Unconventional ideas are explicitly welcome.
@@ -170,17 +189,34 @@ Any `PENDING_HUMAN` entry makes the deliverable **provisional** (Article 16). Th
 - Summary: what is now reusable from this cycle?
 - **Validation matrix update:** if the cycle added, removed, or modified any deployment target, credential, or verification procedure, the VALIDATOR matrix must be updated before this step is marked complete.
 
+**Close checklist (required before cycle can archive):**
+- [ ] `metrics/summary.yaml` — `total_cycles` incremented, `memory_entries` counts updated, `last_updated` set to today
+- [ ] At least one memory entry written or explicitly updated in `memory/`
+- [ ] All failures from this cycle confirmed logged in `memory/errors/` (created or noted as reconstructed if post-hoc)
+- [ ] If any deployment target was added/removed: validation matrix updated
+- [ ] **Documentation (see `protocols/documentation.md`):**
+  - [ ] `docs/MAP.md` updated: any document added, removed, or now known-stale listed with reason
+  - [ ] Any `architecture/` document describing components changed this cycle: `last_verified` updated or staleness flagged
+  - [ ] Any new decision made this cycle: ADR written or planned in `decisions/`
+  - [ ] Any new command/procedure/environment change: reflected in `operations/`
+
 The Librarian's work is not optional. A cycle that leaves no memory entry is constitutionally incomplete (Article 10).
 
 ---
 
 ### Step 11 — EVOLUTION MASTER: Evaluate the Process
 
+**Required in all tracks (minimum output: 2 lines).**
+
 **Output required:**
-- Assessment of how well the 12-step protocol served this cycle
-- Bottlenecks or steps that added no value
-- Proposed improvements to the protocol (if any)
-- Reputation vote recommendations (see [protocols/reputation.md](reputation.md))
+- **Cycle quality score:** [1–5] — one sentence rationale
+  - 1: Protocol was theater — outputs were thin paraphrases, no new insight
+  - 2: Protocol produced some value but most steps were mechanical
+  - 3: Protocol added clear value — at least one step changed the direction or identified a real risk
+  - 4: Protocol was well-suited and efficient for this cycle
+  - 5: Exceptional — protocol produced insights that would not have emerged without the structure
+- Process observations: bottlenecks or steps that added no value (optional if score ≥ 3)
+- Proposed improvements to the protocol (optional; trigger an Article 11 proposal if adopted)
 
 The Evolution Master does not evaluate the solution — it evaluates the process that produced it.
 
@@ -200,6 +236,7 @@ The Arbiter evaluates quality, evidence, and consensus. It does not create or im
 **Constraints on ACCEPTED:**
 - If Step 9 contains any target with status `PENDING_HUMAN`: the Arbiter **must** issue DEFERRED, not ACCEPTED. The DEFERRED condition must name: the target, the verification commands, the human owner, and the method for recording confirmation.
 - If a DEFERRED decision is issued, the condition must include an explicit method for re-opening the cycle (not just "check later"). A DEFERRED without a re-opening mechanism is constitutionally equivalent to abandonment.
+- The Step 10 close checklist must be present and complete. The Arbiter may not issue ACCEPTED or ACCEPTED WITH CONDITIONS if the checklist is absent or has unchecked items without justification.
 
 **The Arbiter's decision closes the cycle.**
 
@@ -223,6 +260,25 @@ If the Arbiter lacks sufficient evidence to decide:
 
 1. The Arbiter requests specific additional evidence from the Scientist (Step 9 re-run, targeted).
 2. If evidence cannot be produced, the Arbiter issues a DEFERRED decision with explicit conditions.
+
+### PENDING_HUMAN resolution
+
+When an archived cycle contains a `PENDING_HUMAN` condition and the human operator has performed the verification:
+
+1. Append to the archived cycle file (`cycles/archive/cycle-NNN.md`):
+
+   ```
+   ## Human Verification — [YYYY-MM-DD]
+   Performed by: [name]
+   Target: [target name from condition]
+   Result: VERIFIED | FAILED
+   Notes: [optional]
+   ```
+
+2. If VERIFIED: change the cycle status header to `ACCEPTED`. No new cycle is opened.
+3. If FAILED: open a new Sprint-track cycle referencing `cycle-NNN` as context. The failed verification is the problem statement.
+
+---
 
 ### When a step produces no output
 

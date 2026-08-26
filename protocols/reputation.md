@@ -1,6 +1,10 @@
 # Reputation Protocol
 
-**Version:** 1.0
+**Version:** 1.1
+
+> **Current status:** The per-intervention multi-voter system (v0.1, below) is **suspended** in single-model deployments where self-voting is constitutionally prohibited and no other independent agents exist. Active protocol: **Cycle Quality Score (v0.2)**, defined in Step 11 of `operational-cycle.md`. The v0.1 system is documented below for reference and future multi-provider activation.
+
+---
 
 ---
 

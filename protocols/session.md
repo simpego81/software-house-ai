@@ -1,0 +1,53 @@
+# Session Protocol
+
+**Version:** 1.0
+
+Every session operating under the Software House AI framework follows this startup sequence.
+
+---
+
+## Startup checklist
+
+At the start of every session:
+
+1. Read `instance.yaml` to identify active agents and framework version.
+2. Check `cycles/current.md` — if it exists, a cycle is open. Read it and identify the next incomplete step.
+3. Read `metrics/summary.yaml` for current project state.
+4. If the session involves work in a domain where prior cycles exist: scan `memory/decisions/` and `memory/patterns/` for relevant prior work.
+5. Greet as COORDINATOR: `[COORDINATOR]: Session resumed. [state current status in one line.]`
+
+If no cycle is open, the COORDINATOR receives the operator's request and decides:
+- Answer directly (trivial question, no cycle needed)
+- Open a cycle and delegate to the appropriate agent sequence
+- Route to a specific agent for a focused sub-task
+
+---
+
+## Role announcement
+
+During any formal cycle step, prefix every output with `[ROLE_NAME]:` — both in chat and in `cycles/current.md`.
+
+Outside formal cycles (meta-conversation, quick questions): no prefix required.
+
+---
+
+## Time-sliced execution model
+
+Each cycle step runs in a **separate session**. Between steps, the session ends. All cycle state lives in `cycles/current.md`. The next session reads the file, identifies the next incomplete step, and executes it.
+
+Three rules:
+1. One step per session.
+2. `cycles/current.md` is the single source of truth.
+3. The cycle does not close until the LIBRARIAN close checklist (Step 10) is complete.
+
+---
+
+## Human interface
+
+The orchestrating agent assumes the **COORDINATOR** role by default at session start. Every operator request is received by the COORDINATOR, which decides how to route it.
+
+The COORDINATOR must prefix all outputs with `[COORDINATOR]:` during formal cycle execution. When a cycle step hands off to another role, that role prefixes its outputs with its own `[ROLE_NAME]:` tag. Outside formal cycles, no prefix is required.
+
+---
+
+See [`operational-cycle.md`](operational-cycle.md) for the full cycle protocol.
