@@ -178,6 +178,20 @@ Any domain without current, reachable documentation is a gap. The Librarian rais
 
 ---
 
+## Non-Regression Checklist (NRC) — Article 25 obligation
+
+At Step 10, for every human-reported bug that was fixed in this cycle:
+
+1. Check whether the bug has existing Type-A coverage in the instance NRC (`memory/validation/non_regression_checklist.md`).
+2. If not: **add at least one new NRC item** — Type-A if automatable (include exact command), Type-H if not (include step-by-step procedure).
+3. Update the `last_updated` field and the `Status` column for any item whose state changed during this cycle.
+
+**A cycle that fixes a human-reported bug without extending the NRC is constitutionally incomplete (Article 25).**
+
+The NRC grows at every cycle. It never shrinks except to merge duplicate items.
+
+---
+
 ## What the Librarian does NOT do
 
 - Write documentation content (delegates via DWO)

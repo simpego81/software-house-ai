@@ -385,6 +385,24 @@ The VALIDATOR's configurations are ecosystem memory (Article 7). They must be st
 
 ---
 
+## Article 25 — Non-Regression Obligation
+
+Every cycle that modifies a module listed in the instance's Non-Regression Checklist (NRC) must pass all Type-A (automated) checklist items before the Arbiter may issue ACCEPTED.
+
+A Type-A regression — a previously-passing automated test that now fails — is a blocking condition equivalent to a Critical finding from the Critic (Step 5). The Builder (Step 7) must eliminate the regression before Step 9 proceeds.
+
+The VALIDATOR (Article 24) owns the Non-Regression Checklist. It is a versioned artifact stored in `memory/validation/` alongside the validation matrix.
+
+The Librarian (Step 10) must add at least one NRC item for every human-reported bug that is fixed in a cycle and had no prior automated test coverage. An NRC item is:
+- **Type-A** if the regression can be detected by an automated test (preferred).
+- **Type-H** if it requires a human interactive session to verify.
+
+A cycle that fixes a human-reported bug without extending the NRC with at least one new item is constitutionally incomplete.
+
+Urgency is not a valid justification for skipping Type-A verification. The only valid justification for skipping NRC verification is explicit documentation that the cycle did not touch any module covered by the NRC.
+
+---
+
 ## Ecosystem Motto
 
 > "Ideas compete. Knowledge cooperates. The ecosystem evolves."

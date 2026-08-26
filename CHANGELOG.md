@@ -6,6 +6,20 @@ Format: `[version] — YYYY-MM-DD`
 
 ---
 
+## [0.5.0] — 2026-08-27
+
+### Added (constitutional amendment — Article 25)
+
+- **Article 25 — Non-Regression Obligation** (`CONSTITUTION.md`): every cycle that modifies a module covered by the instance's Non-Regression Checklist (NRC) must pass all Type-A (automated) items before ACCEPTED. A Type-A regression is a blocking condition. Urgency is not a valid justification for skipping verification.
+
+### Updated (operational protocol — Article 25)
+
+- **Step 9 (SCIENTIST)**: mandatory Non-Regression Check when NRC modules are touched. Must announce `NRC Type-A: N/M passed`. Type-A failure is a blocking regression equivalent to a Critical finding.
+- **Step 10 (LIBRARIAN)**: must add at least one NRC item for every human-reported bug fixed without prior test coverage. NRC grows at every cycle; never shrinks.
+- `agents/07-librarian.md`: added explicit NRC responsibility section with Article 25 obligation.
+
+---
+
 ## [0.4.0] — 2026-08-26
 
 ### Added (operational protocol — Article 11)

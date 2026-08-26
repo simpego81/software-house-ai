@@ -178,6 +178,21 @@ Status: VERIFIED | PENDING_HUMAN | SKIPPED_JUSTIFIED
 
 Any `PENDING_HUMAN` entry makes the deliverable **provisional** (Article 16). The Arbiter may not issue ACCEPTED until it is resolved (see Step 12).
 
+**Non-Regression Check (mandatory when NRC modules are touched):**
+
+Before reporting VERIFIED results, the SCIENTIST must:
+
+1. Identify which source modules this cycle modified.
+2. Compare against the instance's Non-Regression Checklist (`memory/validation/non_regression_checklist.md`). If any modified module appears in the NRC:
+   a. **Run all Type-A items** (automated). Every failure is a blocking regression — report it as a Critical finding and stop.
+   b. Announce `NRC Type-A: N/M passed` in the Step 9 output.
+3. If Type-H items apply (module touched and human session available): run them and report results as VERIFIED or PENDING_HUMAN.
+4. If Type-H items are not available interactively: report `PENDING_HUMAN` with the exact commands and expected outcomes from the NRC.
+
+A Type-A regression (a previously-passing automated test that now fails) is equivalent to a Critical Critic finding. The Builder must fix it before the Arbiter may issue ACCEPTED (Article 25).
+
+The only valid justification for skipping NRC verification: the cycle demonstrably did not touch any module listed in the NRC header. This must be stated explicitly.
+
 ---
 
 ### Step 10 — LIBRARIAN: Update Memory
@@ -199,6 +214,14 @@ Any `PENDING_HUMAN` entry makes the deliverable **provisional** (Article 16). Th
   - [ ] Any `architecture/` document describing components changed this cycle: `last_verified` updated or staleness flagged
   - [ ] Any new decision made this cycle: ADR written or planned in `decisions/`
   - [ ] Any new command/procedure/environment change: reflected in `operations/`
+
+**Non-Regression Checklist update (Article 25):**
+
+For every human-reported bug that is fixed in this cycle and had no prior automated test coverage, the LIBRARIAN must add at least one item to the instance NRC (`memory/validation/non_regression_checklist.md`):
+- **Type-A** if the regression is detectable by an automated test (preferred — include the exact command to run it).
+- **Type-H** if it requires a human interactive session (include step-by-step procedure).
+
+A cycle that fixes a human-reported bug without extending the NRC with at least one new item is constitutionally incomplete (Article 25).
 
 The Librarian's work is not optional. A cycle that leaves no memory entry is constitutionally incomplete (Article 10).
 
