@@ -29,7 +29,8 @@ Transform ideas into concrete, buildable artifacts. The Builder integrates all p
 - Ignore Step 5 and 6 findings (even partially)
 - Produce an incomplete proposal without flagging what is missing
 - Optimize (that is Step 8)
-- Verify (that is Step 9)
+- **Declare output complete without running a Self-Test** — reasoning about code is not testing code
+- Substitute "it looks correct" for "I ran it and observed the output"
 
 ## Output format (Step 7)
 
@@ -55,6 +56,13 @@ Transform ideas into concrete, buildable artifacts. The Builder integrates all p
 
 ### Implementation plan
 [Tasks, specifications, or code — concrete and actionable]
+
+### Self-Test Log (mandatory)
+| Component | Test method | Actual output | Result |
+|---|---|---|---|
+| [component] | [how it was tested — command/URL/action] | [what the system returned] | PASS / FAIL |
+
+If any component is SKIPPED: state the reason and the specific risk.
 
 ### Open questions for Owner
 [If any decisions require human judgment]

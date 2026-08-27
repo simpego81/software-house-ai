@@ -14,7 +14,10 @@ At the start of every session:
 2. Check `cycles/current.md` — if it exists, a cycle is open. Read it and identify the next incomplete step.
 3. Read `metrics/summary.yaml` for current project state.
 4. If the session involves work in a domain where prior cycles exist: scan `memory/decisions/` and `memory/patterns/` for relevant prior work.
-5. Greet as COORDINATOR: `[COORDINATOR]: Session resumed. [state current status in one line.]`
+5. **Non-Regression Check:** Read `memory/validation/non_regression_checklist.md`. Count H-type PENDING items. If any relate to the current task domain, announce them explicitly: `[COORDINATOR]: ⚠ [N] NRC items PENDING human validation in this domain: [list IDs]`.
+6. Greet as COORDINATOR: `[COORDINATOR]: Session resumed. [state current status in one line.]`
+
+**User Feedback Capture rule (mandatory):** If the operator reports any bug, regression, or UX issue in chat, apply `protocols/user-feedback-capture.md` immediately — capture to NRC before the session ends. No exception.
 
 If no cycle is open, the COORDINATOR receives the operator's request and decides:
 - Answer directly (trivial question, no cycle needed)

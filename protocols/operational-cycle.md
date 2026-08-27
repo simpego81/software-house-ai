@@ -131,9 +131,58 @@ The Destroyer's job is to break things. If it cannot find a way to break a solut
 - Concrete implementation plan (tasks, specifications, or code)
 - Explicit response to each Critic and Destroyer finding
 - Unresolved issues clearly flagged (not hidden)
+- **Self-Test Log** (mandatory — see below)
 - Confidence level: High | Medium | Low
 
 The Builder does not ignore Step 5 and 6 findings. Every finding must be addressed or explicitly deferred with justification.
+
+---
+
+#### BUILDER Self-Test Protocol (mandatory)
+
+**Reasoning about code is not testing code. Execution is required.**
+
+Before declaring output, the BUILDER must execute a Self-Test for every changed component. The Self-Test Log is part of the Step 7 output — without it, the step is invalid.
+
+**Self-Test Log format:**
+
+```
+Self-Test Log:
+  Component: <name of changed module/endpoint/function>
+  Test method: <how it was executed — command run, HTTP request made, UI action performed>
+  Actual output: <what the system actually returned/showed>
+  Expected output: <what was expected>
+  Result: PASS | FAIL
+  Notes: <any discrepancy, even minor>
+```
+
+**Rules by component type:**
+
+| Component type | Required test method |
+|---|---|
+| Server endpoint | Start server → make actual HTTP request → verify response content |
+| Client-side UI feature | Open browser → perform the exact user action → observe result |
+| CLI tool | Run the command → capture actual stdout/stderr |
+| Pure function | Call it with representative inputs → check return value |
+| Configuration change | Restart the affected process → verify behavior changed |
+
+**When testing is impossible in the current environment:**
+
+The BUILDER must state explicitly:
+```
+Self-Test: SKIPPED
+Reason: <specific technical reason why execution is impossible>
+Risk: <what could go wrong that testing would have caught>
+Mitigation: <how the SCIENTIST step will cover this>
+```
+
+SKIPPED is not a get-out clause — it transfers full verification responsibility to the SCIENTIST. If the SCIENTIST cannot verify either, the deliverable is PROVISIONAL and cannot reach ACCEPTED.
+
+**Anti-patterns that are NOT a valid Self-Test:**
+- Reading the code and reasoning it is correct
+- Unit-testing adjacent code that doesn't exercise the change
+- Declaring confidence based on similarity to past work
+- "It compiles / has no syntax errors"
 
 ---
 
