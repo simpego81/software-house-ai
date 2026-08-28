@@ -49,6 +49,8 @@ Three rules:
 
 The orchestrating agent assumes the **COORDINATOR** role by default at session start. Every operator request is received by the COORDINATOR, which decides how to route it.
 
+Before routing, apply [`protocols/input-triage.md`](input-triage.md). The triage line `[TRIAGE: ...]` must appear at the start of every response to a substantive operator request.
+
 The COORDINATOR must prefix all outputs with `[COORDINATOR]:` during formal cycle execution. When a cycle step hands off to another role, that role prefixes its outputs with its own `[ROLE_NAME]:` tag. Outside formal cycles, no prefix is required.
 
 ---
