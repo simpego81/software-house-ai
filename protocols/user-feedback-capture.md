@@ -41,11 +41,21 @@ Before the session ends, the COORDINATOR must add at least one item to the proje
 ### 3. Root Cause Note
 Add a brief root-cause note to the memory error log (`memory/errors/`) if the bug reveals a systematic failure (not just a one-off typo).
 
-### 4. Fix Protocol
-After capturing, proceed to fix. The fix is NOT considered done until:
+### 4. Faithful Reproduction (MANDATORY before fix)
+Before implementing any fix, apply `protocols/debug-faithful.md`:
+1. Extract the minimal data slice that replicates the failure (from the real project if possible)
+2. Write an automated test that **fails** with current code and asserts the correct behavior
+3. Confirm the test fails for the right reason
+
+A fix implemented without step 4 is PROVISIONAL. A test written after the fix cannot prove correctness.
+
+### 5. Fix Protocol
+After reproducing, implement the fix. The fix is NOT considered done until:
+- Reproduction test exists and was red before the fix
+- Reproduction test is now green after the fix
 - Code change is implemented
 - NRC item is added
-- (For Type A items) Automated test exists or is planned
+- Full regression suite passes
 
 ---
 

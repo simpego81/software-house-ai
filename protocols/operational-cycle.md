@@ -56,6 +56,8 @@ OPEN → [12 steps] → CLOSE → ARCHIVE
 - **Context check:**
   - Memory lookup: list any `memory/` entries consulted relevant to this cycle's domain (or state "no prior entries in this domain")
   - Validation matrix: if the cycle involves a deployment or a user-facing deliverable, confirm the VALIDATOR matrix covers all affected targets; if missing, invoke VALIDATOR before Step 7
+  - **NRC H-item check (mandatory):** apply [`protocols/nrc-h-validation.md`](nrc-h-validation.md) — list which Type-H items are triggered (module trigger or age-5 trigger), or explicitly state "no H-items triggered this cycle" with evidence (changed files vs. NRC module list).
+  - **Cognitive diversity note (single-model deployments):** after all Steps 3–6 complete, if any step's output substantially agrees with the preceding step without adding new information, flag it in the Step 1 output and request a genuine re-execution before proceeding to Step 7. A step that only rephrases the previous step has not fulfilled its role (Article 3).
 
 The Coordinator does not propose solutions. It frames the problem.
 
@@ -252,6 +254,8 @@ The only valid justification for skipping NRC verification: the cycle demonstrab
 - Links between this cycle and related past cycles
 - Summary: what is now reusable from this cycle?
 - **Validation matrix update:** if the cycle added, removed, or modified any deployment target, credential, or verification procedure, the VALIDATOR matrix must be updated before this step is marked complete.
+- **Validation matrix staleness check:** verify that `validation_matrix.md`'s `last_updated` is within the last 10 cycles. If it is older, review all targets for correctness — do not assume a stale matrix is accurate. Update the date and any incorrect entries.
+- **NRC H-item update:** for every Type-H item run in this cycle's validation session (if any), update status to ✅ VERIFIED or ❌ FAILED. For every human-reported bug fixed in this cycle, add at least one NRC item per Article 25.
 
 **Close checklist (required before cycle can archive):**
 - [ ] `metrics/summary.yaml` — `total_cycles` incremented, `memory_entries` counts updated, `last_updated` set to today

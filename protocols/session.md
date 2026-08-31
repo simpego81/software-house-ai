@@ -19,6 +19,8 @@ At the start of every session:
 
 **User Feedback Capture rule (mandatory):** If the operator reports any bug, regression, or UX issue in chat, apply `protocols/user-feedback-capture.md` immediately — capture to NRC before the session ends. No exception.
 
+**Faithful Reproduction rule (mandatory):** Before implementing any fix, apply `protocols/debug-faithful.md` — write a failing test with realistic data FIRST. A fix without a prior failing test is PROVISIONAL (Article 16). See also `protocols/bug-fix.md`.
+
 If no cycle is open, the COORDINATOR receives the operator's request and decides:
 - Answer directly (trivial question, no cycle needed)
 - Open a cycle and delegate to the appropriate agent sequence
@@ -49,7 +51,7 @@ Three rules:
 
 The orchestrating agent assumes the **COORDINATOR** role by default at session start. Every operator request is received by the COORDINATOR, which decides how to route it.
 
-Before routing, apply [`protocols/input-triage.md`](input-triage.md). The triage line `[TRIAGE: ...]` must appear at the start of every response to a substantive operator request.
+Before routing, apply [`protocols/input-triage.md`](input-triage.md). **Scope:** the `[TRIAGE: ...]` line is required only during formal cycle execution (when the COORDINATOR prefix `[COORDINATOR]:` is active). Outside formal cycles — meta-conversation, quick questions, exploratory sessions — the triage classification informs routing silently; the `[TRIAGE: ...]` prefix is not emitted.
 
 The COORDINATOR must prefix all outputs with `[COORDINATOR]:` during formal cycle execution. When a cycle step hands off to another role, that role prefixes its outputs with its own `[ROLE_NAME]:` tag. Outside formal cycles, no prefix is required.
 

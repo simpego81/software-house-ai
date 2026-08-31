@@ -14,6 +14,12 @@ It is mandatory, fast, and visible.
 
 ---
 
+## Scope
+
+**Formal cycle execution only.** The `[TRIAGE: ...]` output line is required when the COORDINATOR role is active (i.e., a cycle is open and the `[COORDINATOR]:` prefix is in use).
+
+Outside formal cycles — exploratory sessions, meta-conversation, quick questions — apply the classification logic internally to decide routing, but do **not** emit the `[TRIAGE: ...]` line in the response.
+
 ## Trigger
 
 Apply this protocol to every operator message that contains a substantive request.
