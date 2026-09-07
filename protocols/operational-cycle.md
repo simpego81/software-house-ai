@@ -22,7 +22,8 @@ The COORDINATOR selects a track at Step 1 and records it in the cycle header (`*
 |-------|---------------|-------------|
 | S — Sprint | 1 · 7 · 9 · 12 | Hotfixes, single-component changes where design is already settled |
 | M — Standard | 1 · 2 · 3 · 5 · 7 · 8 · 9 · 10 · 11 · 12 | Feature work with design to be decided |
-| F — Full | All 12 | Architectural decisions, new modules, cross-cutting changes, self-assessment |
+| F — Full | All 12 | Architectural decisions, new modules, cross-cutting changes |
+| SA — Self-Assessment | 1 · 2 · 3 · 5 · 7 · 8 · 9 · 10 · 11 · 12 | Self-assessment, framework modifications, process retrospectives (single-model deployments where Explorer/Destroyer produce marginal value for meta-work) |
 
 In Track S, skipped steps are not present in `current.md` — they are out of scope by design, not bypassed.  
 In Track M, Steps 4 (Explorer) and 6 (Destroyer) are optional: include them if the problem space is novel or adversarial risk is relevant.  
