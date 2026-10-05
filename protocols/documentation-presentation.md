@@ -28,9 +28,9 @@ The contract applies whenever project documentation is published for an audience
 
 6. **Scales to many use cases.** Navigation and the use-case page template must be data-driven (a registry of use cases), so adding a use case does not require redesigning the site. The first use case is not special-cased.
 
-7. **One source of truth.** The authoritative documentation stays in the repo's `docs/` tree and the structured diagram source (e.g. `archimate/` cells). The published site is a *derived view*. A published page that cannot be reproduced from the repo is a snapshot, not documentation (Article 10).
+7. **One source of truth.** The authoritative documentation stays in the repo's `docs/` tree and the structured diagram source (e.g. `archimate/` layer files). The published site is a *derived view*. A published page that cannot be reproduced from the repo is a snapshot, not documentation (Article 10).
 
-8. **Diagrams-as-code remain authoritative.** Rendered images/SVG are presentation supplements; the fenced code block (PlantUML/Mermaid) or the structured source (cells) remains the source of truth. If the renderer fails, the code block is still legible (graceful fallback).
+8. **Diagrams-as-code remain authoritative.** Rendered images/SVG are presentation supplements; the fenced code block (PlantUML/Mermaid) or the structured source (layer files) remains the source of truth. If the renderer fails, the code block is still legible (graceful fallback).
 
 9. **Frontend quality bar.** Browser-observed rendering, no console errors, responsive ≤480px, `prefers-reduced-motion` respected, CDN version-pinned with `onerror` fallback, graceful degradation when JS fails. See `protocols/frontend-checklist.md`.
 

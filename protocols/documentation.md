@@ -86,22 +86,27 @@ Rendered images (PNG, SVG exports) are permitted as supplements — for stakehol
 
 A diagram that exists only as an image is not a maintained diagram — it is a snapshot. Snapshots are not documentation.
 
-### Structured ArchiMate source (cell-based pattern)
+### Structured ArchiMate source (per-layer pattern)
 
-For ArchiMate models, a project may maintain a **structured data source** alongside `docs/`, in a top-level `archimate/` directory. The diagram-as-code block in the `architecture/` document is then **derived** from that source by a generator, not drawn by hand.
+For ArchiMate models, a project may maintain a **structured data source** alongside `docs/`, in a top-level `archimate/` directory. The diagram-as-code block in the `architecture/` document is then **derived** from that source by a generator, not drawn by hand. What belongs in the model is governed by [`archimate-modeling.md`](archimate-modeling.md).
 
 ```
 archimate/
   _vocabulary.md                     ← minimal element/relationship vocabulary
   <use-case>/                        ← one directory per use case
-    <layer>--<aspect>.md             ← one file per pertinent cell (Service Layer × Aspect)
+    motivationlayer.md               ← one file per layer
+    businesslayer.md
+    applicationlayer.md
+    technologylayer.md
 ```
 
-Each cell file is markdown with a YAML frontmatter declaring `use_case`, `layer`, `aspect`, `elements[]` (id, type, name) and `relationships[]` (from, to, type, label), validated against `_vocabulary.md`. A use case populates only the **pertinent** cells, not all 16.
+Each layer file lists its elements (id, aspect, type, name, role, tech) and the relationships whose `from` element is in that layer, so cross-layer relations always have a home. Types are validated against `_vocabulary.md`. A use case fills only the pertinent aspects of each layer.
+
+*Superseded:* the earlier one-file-per-cell layout (`<layer>--<aspect>.md`) made cross-layer relations homeless and led to disconnected models.
 
 The derived view (PlantUML block + Service Layer × Aspect matrix) is injected into the use case document between idempotent markers (`<!-- archimate:gen start -->` / `<!-- archimate:gen end -->`) by a generator script. A `--check` mode regenerates and diffs against the committed block; a mismatch fails, so the committed diagram cannot drift from the source.
 
-This pattern is optional per project but recommended when ArchiMate coverage must stay granular and drift-free. When adopted, the `archimate/` cells are the **primary source** and the diagram block is a **derived view**; the Librarian issues DWOs against the cells, not the rendered block.
+This pattern is optional per project but recommended when ArchiMate coverage must stay granular and drift-free. When adopted, the `archimate/` layer files are the **primary source** and the diagram block is a **derived view**; the Librarian issues DWOs against the layer files, not the rendered block.
 
 ---
 
