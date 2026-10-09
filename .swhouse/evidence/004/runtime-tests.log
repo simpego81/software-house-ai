@@ -1,0 +1,60 @@
+$ python -m unittest discover -s tests -v
+
+STDOUT
+Opened cycle 003: .swhouse\cycles\open\003.yaml
+ERROR   EVIDENCE_NOT_FOUND: Evidence for fake does not exist: .swhouse/evidence/003/does-not-exist.log
+WOULD_BLOCK: close policy is not satisfied
+Opened cycle 003: .swhouse\cycles\open\003.yaml
+PASSED tests (exit 0) -> .swhouse/evidence/003/tests.log
+KNOWN   ARCHIVED_NOT_CLOSED: Archived cycle has status='open' [.swhouse\cycles\archive\cycle-001.md]
+WARNING STALE_OWNER_APPROVAL: Closed archive still contains an awaiting Owner approval marker [.swhouse\cycles\archive\cycle-002.md]
+Opened cycle 003: .swhouse\cycles\open\003.yaml
+FAILED missing (exit 127) -> .swhouse/evidence/003/missing.log
+Opened cycle 003: .swhouse\cycles\open\003.yaml
+Cycle 003 change ref: working-tree:test
+Cycle 003 AC-01: met
+PASSED smoke (exit 0) -> .swhouse/evidence/003/smoke.log
+POLICY_OK
+WOULD_ALLOW: SHADOW ACCEPTED (dry run; pass --apply to archive)
+POLICY_OK
+Archived shadow cycle 003: .swhouse\cycles\archive-v2\003.yaml
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-09T15:48:52+00:00",
+  "source": "cycles/archive-v2",
+  "cycles_closed": 1,
+  "outcomes": {
+    "ACCEPTED": 1
+  },
+  "outcomes_by_governance_mode": {
+    "shadow": {
+      "ACCEPTED": 1
+    }
+  },
+  "median_lead_time_hours_by_profile": {
+    "SPRINT": 0.0
+  },
+  "verification_completeness": 1.0
+}
+Written: .swhouse\metrics\generated.json
+
+STDERR
+test_complete_sprint_can_close (test_policy.ClosePolicyTests.test_complete_sprint_can_close) ... ok
+test_deferred_requires_reopen_trigger (test_policy.ClosePolicyTests.test_deferred_requires_reopen_trigger) ... ok
+test_missing_evidence_blocks_close (test_policy.ClosePolicyTests.test_missing_evidence_blocks_close) ... ok
+test_standard_requires_challenge_and_rollback (test_policy.ClosePolicyTests.test_standard_requires_challenge_and_rollback) ... ok
+test_security_surface_escalates_to_guarded (test_policy.RoutePolicyTests.test_security_surface_escalates_to_guarded) ... ok
+test_sprint_requires_reversible_native_low_risk_change (test_policy.RoutePolicyTests.test_sprint_requires_reversible_native_low_risk_change) ... ok
+test_close_rejects_missing_evidence_file (test_runtime.RuntimeIntegrationTests.test_close_rejects_missing_evidence_file) ... ok
+test_configured_check_cannot_be_substituted (test_runtime.RuntimeIntegrationTests.test_configured_check_cannot_be_substituted) ... ERROR: Check tests is configured as ['C:\\Python311\\python.exe', '-c', "print('expected')"]; refusing command substitution
+ok
+test_doctor_baseline_allows_known_error (test_runtime.RuntimeIntegrationTests.test_doctor_baseline_allows_known_error) ... ok
+test_doctor_reports_known_legacy_inconsistencies (test_runtime.RuntimeIntegrationTests.test_doctor_reports_known_legacy_inconsistencies) ... ok
+test_evidence_redacts_common_secret_formats (test_runtime.RuntimeIntegrationTests.test_evidence_redacts_common_secret_formats) ... ok
+test_missing_check_executable_is_recorded_as_failure (test_runtime.RuntimeIntegrationTests.test_missing_check_executable_is_recorded_as_failure) ... ok
+test_sprint_lifecycle_and_generated_metrics (test_runtime.RuntimeIntegrationTests.test_sprint_lifecycle_and_generated_metrics) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.904s
+
+OK

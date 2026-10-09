@@ -1,0 +1,66 @@
+schema_version: 2
+id: '003'
+status: closed
+governance_mode: shadow
+profile: GUARDED
+problem: Implement the evidence-driven v2 runtime in shadow mode
+opened_at: '2026-10-09T15:45:10+00:00'
+scope:
+  in: []
+  out: []
+acceptance_criteria:
+- id: AC-01
+  text: Doctor detects known legacy drift without mutating it
+  status: met
+- id: AC-02
+  text: Configured executable evidence gates accepted cycles
+  status: met
+- id: AC-03
+  text: Routing and close policies are deterministic and tested
+  status: met
+- id: AC-04
+  text: Legacy state and pre-existing user changes remain untouched
+  status: met
+risk:
+  reversible: true
+  native_verification_available: true
+  blast_radius: high
+  public_contract: true
+change:
+  ref: working-tree:runtime-v2-I1-I4
+checks:
+- id: runtime-tests
+  command:
+  - python
+  - -m
+  - unittest
+  - discover
+  - -s
+  - tests
+  - -v
+  required: true
+  status: passed
+  exit_code: 0
+  executed_at: '2026-10-09T15:46:04+00:00'
+  evidence: .swhouse/evidence/003/runtime-tests.log
+challenges:
+- mode: logical
+  reviewer_context: same-model
+  independent: false
+  artifact: working-tree:src/swhouse,tests
+  findings: 3
+  status: completed
+  recorded_at: '2026-10-09T15:45:34+00:00'
+findings: []
+pending_human: []
+rollback:
+  strategy: Remove isolated v2 runtime files and pilot-created .swhouse v2 paths;
+    retain all legacy archives
+  verified: false
+approval:
+  owner: human Owner - evolution plan accepted 2026-10-09
+resolution:
+  reason: null
+  reopen_trigger: null
+outcome: ACCEPTED
+closed_at: '2026-10-09T15:46:40+00:00'

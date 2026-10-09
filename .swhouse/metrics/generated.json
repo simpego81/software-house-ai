@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-09T15:52:11+00:00",
+  "source": "cycles/archive-v2",
+  "cycles_closed": 4,
+  "outcomes": {
+    "ACCEPTED": 4
+  },
+  "outcomes_by_governance_mode": {
+    "shadow": {
+      "ACCEPTED": 4
+    }
+  },
+  "median_lead_time_hours_by_profile": {
+    "GUARDED": 0.019,
+    "SPRINT": 0.009,
+    "STANDARD": 0.007
+  },
+  "verification_completeness": 1.0
+}

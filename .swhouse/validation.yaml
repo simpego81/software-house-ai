@@ -1,0 +1,8 @@
+schema_version: 2
+checks:
+  - id: runtime-tests
+    description: Run the provider-agnostic runtime test suite
+    command: [python, -m, unittest, discover, -s, tests, -v]
+    profiles: [SPRINT, STANDARD, GUARDED, REVERT, EXPERIMENT]
+    required: true
+    timeout_seconds: 120

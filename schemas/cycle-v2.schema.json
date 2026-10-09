@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://software-house-ai.local/schemas/cycle-v2.schema.json",
+  "title": "Software House AI cycle v2",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "status",
+    "governance_mode",
+    "profile",
+    "problem",
+    "opened_at",
+    "acceptance_criteria",
+    "risk",
+    "change",
+    "checks"
+  ],
+  "properties": {
+    "schema_version": { "const": 2 },
+    "id": { "type": "string", "pattern": "^[0-9]{3,}$" },
+    "status": { "enum": ["open", "closed"] },
+    "governance_mode": { "enum": ["shadow", "enforced"] },
+    "profile": {
+      "enum": ["SPRINT", "STANDARD", "GUARDED", "REVERT", "EXPERIMENT"]
+    },
+    "problem": { "type": "string", "minLength": 1 },
+    "opened_at": { "type": "string", "format": "date-time" },
+    "closed_at": { "type": "string", "format": "date-time" },
+    "outcome": {
+      "enum": ["ACCEPTED", "PROVISIONAL", "DEFERRED", "REJECTED", "REVERTED"]
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text", "status"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["pending", "met", "not_met"] }
+        }
+      }
+    },
+    "risk": { "type": "object" },
+    "change": {
+      "type": "object",
+      "properties": { "ref": { "type": ["string", "null"] } }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "command", "required", "status", "exit_code", "evidence"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "command": { "type": "array", "items": { "type": "string" } },
+          "required": { "type": "boolean" },
+          "timeout_seconds": { "type": "integer", "minimum": 1 },
+          "status": { "enum": ["passed", "failed", "pending", "skipped"] },
+          "exit_code": { "type": ["integer", "null"] },
+          "evidence": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "challenges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["mode", "reviewer_context", "independent", "artifact", "status"],
+        "properties": {
+          "mode": { "enum": ["logical", "adversarial", "ux"] },
+          "reviewer_context": {
+            "enum": ["same-model", "fresh-context", "different-model", "human", "tool"]
+          },
+          "independent": { "type": "boolean" },
+          "artifact": { "type": "string", "minLength": 1 },
+          "findings": { "type": "integer", "minimum": 0 },
+          "status": { "const": "completed" }
+        }
+      }
+    },
+    "revert": {
+      "type": "object",
+      "properties": {
+        "target": { "type": "string" },
+        "reason": { "type": "string" },
+        "status": { "enum": ["planned", "applied", "conflict"] },
+        "commit": { "type": "string" },
+        "evidence": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": true
+}

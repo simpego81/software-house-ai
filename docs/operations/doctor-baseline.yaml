@@ -1,0 +1,4 @@
+version: 1
+allowed:
+  - code: ARCHIVED_NOT_CLOSED
+    path: .swhouse/cycles/archive/cycle-001.md

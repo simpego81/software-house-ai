@@ -1,0 +1,61 @@
+schema_version: 2
+id: '004'
+status: closed
+governance_mode: shadow
+profile: STANDARD
+problem: Harden evidence integrity and shadow governance semantics
+opened_at: '2026-10-09T15:48:33+00:00'
+scope:
+  in: []
+  out: []
+acceptance_criteria:
+- id: AC-01
+  text: Missing or out-of-project evidence blocks close
+  status: met
+- id: AC-02
+  text: Missing executables and timeouts become visible failed checks
+  status: met
+- id: AC-03
+  text: Shadow outcomes remain separate from enforced governance
+  status: met
+risk:
+  reversible: true
+  native_verification_available: true
+  blast_radius: medium
+change:
+  ref: working-tree:runtime-v2-hardening
+checks:
+- id: runtime-tests
+  command:
+  - python
+  - -m
+  - unittest
+  - discover
+  - -s
+  - tests
+  - -v
+  required: true
+  status: passed
+  exit_code: 0
+  executed_at: '2026-10-09T15:48:53+00:00'
+  evidence: .swhouse/evidence/004/runtime-tests.log
+challenges:
+- mode: logical
+  reviewer_context: same-model
+  independent: false
+  artifact: working-tree:src/swhouse/cli.py,src/swhouse/metrics.py,tests
+  findings: 2
+  status: completed
+  recorded_at: '2026-10-09T15:48:42+00:00'
+findings: []
+pending_human: []
+rollback:
+  strategy: Revert evidence path, timeout and governance-mode changes
+  verified: false
+approval:
+  owner: null
+resolution:
+  reason: null
+  reopen_trigger: null
+outcome: ACCEPTED
+closed_at: '2026-10-09T15:48:59+00:00'

@@ -1,0 +1,4 @@
+schema_version: 2
+mode: shadow
+concurrent_cycles: false
+validation_file: validation.yaml

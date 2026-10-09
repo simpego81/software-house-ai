@@ -1,0 +1,65 @@
+schema_version: 2
+id: '005'
+status: closed
+governance_mode: shadow
+profile: GUARDED
+problem: Implement first-class safe Git revert workflow
+opened_at: '2026-10-09T15:50:09+00:00'
+scope:
+  in: []
+  out: []
+acceptance_criteria:
+- id: AC-01
+  text: Revert preparation and dry-run do not modify Git
+  status: met
+- id: AC-02
+  text: Dirty product paths block revert application
+  status: met
+- id: AC-03
+  text: Applied revert creates a commit and machine-readable evidence
+  status: met
+- id: AC-04
+  text: Unsupported merge commits and revert failures remain visible
+  status: met
+risk:
+  reversible: true
+  native_verification_available: true
+  blast_radius: high
+  public_contract: true
+change:
+  ref: working-tree:runtime-v2-revert
+checks:
+- id: runtime-tests
+  command:
+  - python
+  - -m
+  - unittest
+  - discover
+  - -s
+  - tests
+  - -v
+  required: true
+  status: passed
+  exit_code: 0
+  executed_at: '2026-10-09T15:50:36+00:00'
+  evidence: .swhouse/evidence/005/runtime-tests.log
+challenges:
+- mode: adversarial
+  reviewer_context: same-model
+  independent: false
+  artifact: working-tree:src/swhouse/cli.py::command_apply_revert,tests::test_prepare_and_apply_revert
+  findings: 2
+  status: completed
+  recorded_at: '2026-10-09T15:50:22+00:00'
+findings: []
+pending_human: []
+rollback:
+  strategy: Remove prepare-revert/apply-revert commands and revert-specific schema/tests
+  verified: false
+approval:
+  owner: human Owner - evolution plan accepted 2026-10-09
+resolution:
+  reason: null
+  reopen_trigger: null
+outcome: ACCEPTED
+closed_at: '2026-10-09T15:50:54+00:00'

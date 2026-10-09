@@ -1,0 +1,51 @@
+schema_version: 2
+id: '006'
+status: closed
+governance_mode: shadow
+profile: SPRINT
+problem: Extend doctor integrity checks to v2 archives
+opened_at: '2026-10-09T15:51:37+00:00'
+scope:
+  in: []
+  out: []
+acceptance_criteria:
+- id: AC-01
+  text: Doctor rejects archived v2 cycles with missing or external evidence
+  status: met
+- id: AC-02
+  text: Existing pilot archives remain healthy
+  status: met
+risk:
+  reversible: true
+  native_verification_available: true
+  blast_radius: low
+change:
+  ref: working-tree:doctor-v2-archive-integrity
+checks:
+- id: runtime-tests
+  command:
+  - python
+  - -m
+  - unittest
+  - discover
+  - -s
+  - tests
+  - -v
+  required: true
+  status: passed
+  exit_code: 0
+  executed_at: '2026-10-09T15:52:00+00:00'
+  evidence: .swhouse/evidence/006/runtime-tests.log
+challenges: []
+findings: []
+pending_human: []
+rollback:
+  strategy: null
+  verified: false
+approval:
+  owner: null
+resolution:
+  reason: null
+  reopen_trigger: null
+outcome: ACCEPTED
+closed_at: '2026-10-09T15:52:10+00:00'
