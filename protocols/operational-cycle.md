@@ -71,6 +71,7 @@ The Coordinator does not propose solutions. It frames the problem.
 - What is the measurable value of solving it?
 - What is the cost of not solving it?
 - Acceptance criteria: how will we know the solution is good enough?
+- **Content vs. rendering:** if the deliverable represents something (a diagram, a model, a document), state acceptance criteria for the correctness of its content separately from criteria for its visual rendering. A deliverable accepted only on appearance has not been accepted on content. For ArchiMate models see [protocols/archimate-modeling.md](archimate-modeling.md) Rule 6.
 - **UX Coherence Check** (if cycle involves any user-facing feature or input): run the checklist in [protocols/ux-coherence.md](ux-coherence.md) and include the `### UX Coherence Check` block. Each finding becomes an acceptance criterion.
 
 If the Product Owner cannot articulate the value, the cycle is paused and returned to the Coordinator for reframing.
