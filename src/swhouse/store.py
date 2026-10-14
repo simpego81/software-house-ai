@@ -84,6 +84,12 @@ class Store:
         return f"{max(identifiers, default=0) + 1:03d}"
 
     def create_cycle(self, cycle: dict[str, Any]) -> Path:
+        legacy_current = self.root / "cycles" / "current.md"
+        if legacy_current.exists():
+            raise InvalidStateError(
+                "A legacy v1 cycle is open (.swhouse/cycles/current.md). Close it with the v1 process "
+                "before opening a v2 cycle: the two models must not overlap."
+            )
         if self.open_paths():
             config = self.config()
             if not config.get("concurrent_cycles", False):

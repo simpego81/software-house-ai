@@ -8,12 +8,14 @@ import sys
 from pathlib import Path
 from typing import Any, Sequence
 
+from .adopt import adopt, rollback_adoption
 from .doctor import diagnose
 from .errors import SwhouseError
+from .evidence import evidence_problem, sha256_file
 from .io import load_yaml
 from .metrics import generate_metrics, write_metrics
-from .model import Outcome, Profile, require_outcome, require_profile
-from .policy import evaluate_close, evaluate_route
+from .model import PENDING_STATUSES, Outcome, Profile, require_outcome, require_profile
+from .policy import evaluate_close, evaluate_route, recommend_profile
 from .store import Store, utc_now
 
 
@@ -23,7 +25,11 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     doctor = subparsers.add_parser("doctor", help="inspect legacy and v2 invariants without modifying state")
-    doctor.add_argument("--baseline", type=Path, help="allow listed known diagnostics")
+    doctor.add_argument(
+        "--baseline",
+        type=Path,
+        help="allow listed known diagnostics (default: .swhouse/doctor-baseline.yaml when present)",
+    )
     subparsers.add_parser("status", help="show open v2 cycle state")
 
     start = subparsers.add_parser("start", help="open a v2 cycle")
@@ -43,7 +49,35 @@ def build_parser() -> argparse.ArgumentParser:
 
     approve = subparsers.add_parser("approve", help="record explicit Owner approval")
     approve.add_argument("owner")
+    approve.add_argument("--ref", help="external proof of the approval: commit, PR, message id")
     approve.add_argument("--cycle")
+
+    route = subparsers.add_parser("route", help="recommend the minimum profile for a declared risk")
+    route.add_argument("--risk", action="append", default=[], metavar="KEY=VALUE")
+
+    add_pending = subparsers.add_parser("add-pending", help="record a verification only a human can perform")
+    add_pending.add_argument("item_id")
+    add_pending.add_argument("description")
+    add_pending.add_argument("--owner", required=True)
+    add_pending.add_argument("--cycle")
+
+    resolve_pending = subparsers.add_parser("resolve-pending", help="resolve, convert or waive a human check")
+    resolve_pending.add_argument("item_id")
+    resolve_pending.add_argument("status", choices=[value for value in PENDING_STATUSES if value != "pending"])
+    resolve_pending.add_argument("--expires", help="ISO date; required for waived")
+    resolve_pending.add_argument("--ref", help="evidence, automated test or Owner decision reference")
+    resolve_pending.add_argument("--cycle")
+
+    adopt_parser = subparsers.add_parser("adopt", help="add v2 files next to legacy state, reversibly")
+    adopt_parser.add_argument("--apply", action="store_true", help="write files (default is a dry run)")
+    adopt_parser.add_argument("--rollback", action="store_true", help="remove only what adopt created")
+    adopt_parser.add_argument(
+        "--check",
+        action="append",
+        default=[],
+        metavar="ID=COMMAND",
+        help="declare a required check; COMMAND is split on spaces, e.g. tests='python -m pytest'",
+    )
 
     challenge = subparsers.add_parser("record-challenge", help="record diff/artifact challenge evidence")
     challenge.add_argument("mode", choices=("logical", "adversarial", "ux"))
@@ -78,7 +112,11 @@ def build_parser() -> argparse.ArgumentParser:
     run_check.add_argument("check_id")
     run_check.add_argument("--cycle")
     run_check.add_argument("--optional", action="store_true")
-    run_check.add_argument("check_command", nargs=argparse.REMAINDER)
+    run_check.add_argument(
+        "check_command",
+        nargs=argparse.REMAINDER,
+        help="ad-hoc command after `--`; omit to run the check configured in validation.yaml",
+    )
 
     close = subparsers.add_parser("close", help="evaluate close policy and optionally archive")
     close.add_argument("--cycle")
@@ -113,6 +151,14 @@ def dispatch(args: argparse.Namespace) -> int:
         return command_set_rollback(store, args)
     if args.command == "approve":
         return command_approve(store, args)
+    if args.command == "route":
+        return command_route(args)
+    if args.command == "add-pending":
+        return command_add_pending(store, args)
+    if args.command == "resolve-pending":
+        return command_resolve_pending(store, args)
+    if args.command == "adopt":
+        return command_adopt(store, args)
     if args.command == "record-challenge":
         return command_record_challenge(store, args)
     if args.command == "resolve":
@@ -135,6 +181,8 @@ def dispatch(args: argparse.Namespace) -> int:
 def command_doctor(store: Store, baseline_path: Path | None = None) -> int:
     diagnostics = diagnose(store)
     allowed: set[tuple[str, str | None]] = set()
+    if baseline_path is None and (store.root / "doctor-baseline.yaml").is_file():
+        baseline_path = store.root / "doctor-baseline.yaml"
     if baseline_path:
         resolved = baseline_path if baseline_path.is_absolute() else store.project_root / baseline_path
         baseline = load_yaml(resolved)
@@ -185,6 +233,9 @@ def command_start(store: Store, args: argparse.Namespace) -> int:
     route = evaluate_route(profile, risk)
     if not route.allowed:
         print_evaluation(route)
+        recommended, _ = recommend_profile(risk)
+        if profile is not Profile.DIRECT and not any(f.code.startswith("RISK_") for f in route.blockers):
+            print(f"HINT: `swhouse route` recommends {recommended.value} for this risk")
         return 1
     cycle_id = store.next_cycle_id()
     configured_checks = checks_for_profile(store.validation(), profile)
@@ -238,9 +289,87 @@ def command_set_rollback(store: Store, args: argparse.Namespace) -> int:
 
 def command_approve(store: Store, args: argparse.Namespace) -> int:
     path, cycle = store.get_open(args.cycle)
-    cycle.setdefault("approval", {})["owner"] = args.owner
+    approval = cycle.setdefault("approval", {})
+    approval["owner"] = args.owner
+    approval["ref"] = args.ref
+    approval["recorded_at"] = utc_now()
     store.save_open(path, cycle)
-    print(f"Cycle {cycle['id']} approved by Owner {args.owner}")
+    note = "" if args.ref else " (no --ref: approval is self-asserted)"
+    print(f"Cycle {cycle['id']} approved by Owner {args.owner}{note}")
+    return 0
+
+
+def command_route(args: argparse.Namespace) -> int:
+    risk = parse_key_values(args.risk)
+    problems = evaluate_route(Profile.STANDARD, risk)
+    hard = [item for item in problems.blockers if item.code.startswith("RISK_")]
+    if hard:
+        print_evaluation(problems)
+        return 1
+    profile, reasons = recommend_profile(risk)
+    print(f"RECOMMENDED {profile.value}")
+    for reason in reasons:
+        print(f"  because: {reason}")
+    return 0
+
+
+def command_add_pending(store: Store, args: argparse.Namespace) -> int:
+    path, cycle = store.get_open(args.cycle)
+    items = cycle.setdefault("pending_human", [])
+    if any(item.get("id") == args.item_id for item in items):
+        raise SwhouseError(f"Pending item already exists: {args.item_id}")
+    items.append(
+        {
+            "id": args.item_id,
+            "description": args.description,
+            "owner": args.owner,
+            "status": "pending",
+            "opened_at": utc_now(),
+        }
+    )
+    store.save_open(path, cycle)
+    print(f"Cycle {cycle['id']} pending human check {args.item_id} for {args.owner}")
+    return 0
+
+
+def command_resolve_pending(store: Store, args: argparse.Namespace) -> int:
+    path, cycle = store.get_open(args.cycle)
+    for item in cycle.get("pending_human") or []:
+        if item.get("id") == args.item_id:
+            if args.status == "waived" and not (args.expires and args.ref):
+                raise SwhouseError("waived requires --expires and --ref (the Owner decision)")
+            if args.status == "converted" and not args.ref:
+                raise SwhouseError("converted requires --ref to the automated check that replaces it")
+            item["status"] = args.status
+            item["resolved_at"] = utc_now()
+            if args.expires:
+                item["expires"] = args.expires
+            if args.ref:
+                item["ref"] = args.ref
+            store.save_open(path, cycle)
+            print(f"Cycle {cycle['id']} pending {args.item_id}: {args.status}")
+            return 0
+    raise SwhouseError(f"Pending item not found: {args.item_id}")
+
+
+def command_adopt(store: Store, args: argparse.Namespace) -> int:
+    if args.rollback:
+        for line in rollback_adoption(store, apply=args.apply):
+            print(line)
+        return 0
+    checks: list[dict[str, Any]] = []
+    for value in args.check:
+        if "=" not in value:
+            raise SwhouseError(f"Expected ID=COMMAND, got: {value}")
+        check_id, command = value.split("=", 1)
+        parts = command.split()
+        if not check_id.strip() or not parts:
+            raise SwhouseError(f"Check needs an id and a command: {value}")
+        checks.append({"id": check_id.strip(), "command": parts})
+    for line in adopt(store, checks, apply=args.apply):
+        print(line)
+    if not args.apply:
+        print("DRY RUN: pass --apply to write these files")
     return 0
 
 
@@ -387,6 +516,12 @@ def command_run_check(store: Store, args: argparse.Namespace) -> int:
     command = list(args.check_command)
     if command and command[0] == "--":
         command = command[1:]
+    optional = bool(args.optional)
+    while command and command[0] == "--optional":
+        optional = True
+        command = command[1:]
+    if command and command[0] == "--":
+        command = command[1:]
     existing = next(
         (item for item in cycle.get("checks") or [] if item.get("id") == args.check_id),
         None,
@@ -439,12 +574,16 @@ def command_run_check(store: Store, args: argparse.Namespace) -> int:
     record = {
         "id": args.check_id,
         "command": redacted_command,
-        "required": existing.get("required", True) if existing else not args.optional,
+        "required": existing.get("required", True) if existing else not optional,
         "status": "passed" if result.returncode == 0 else "failed",
         "exit_code": result.returncode,
         "executed_at": utc_now(),
         "evidence": str(evidence_path.relative_to(store.project_root)).replace("\\", "/"),
+        "evidence_sha256": sha256_file(evidence_path),
+        "configured": bool(configured_command),
     }
+    if existing and existing.get("timeout_seconds"):
+        record["timeout_seconds"] = existing["timeout_seconds"]
     checks = cycle.setdefault("checks", [])
     checks[:] = [item for item in checks if item.get("id") != args.check_id]
     checks.append(record)
@@ -456,24 +595,26 @@ def command_run_check(store: Store, args: argparse.Namespace) -> int:
 def command_close(store: Store, args: argparse.Namespace) -> int:
     path, cycle = store.get_open(args.cycle)
     outcome = require_outcome(args.outcome)
-    evaluation = evaluate_close(cycle, outcome)
+    profile = require_profile(cycle.get("profile"))
+    strict = str(cycle.get("governance_mode", "shadow")) == "enforced"
+    contract = [
+        item["id"]
+        for item in checks_for_profile(store.validation(), profile)
+        if item.get("required", True)
+    ]
+    evaluation = evaluate_close(
+        cycle,
+        outcome,
+        configured_required=contract,
+        require_independent_guarded=strict,
+        strict=strict,
+    )
     for check in cycle.get("checks") or []:
-        if not check.get("required", True) or not check.get("evidence"):
+        if not check.get("required", True):
             continue
-        evidence = (store.project_root / str(check["evidence"])).resolve()
-        try:
-            evidence.relative_to(store.project_root)
-        except ValueError:
-            evaluation.add(
-                "EVIDENCE_OUTSIDE_PROJECT",
-                f"Evidence for {check.get('id', '<unnamed>')} resolves outside the project",
-            )
-            continue
-        if not evidence.is_file():
-            evaluation.add(
-                "EVIDENCE_NOT_FOUND",
-                f"Evidence for {check.get('id', '<unnamed>')} does not exist: {check['evidence']}",
-            )
+        problem = evidence_problem(store.project_root, check)
+        if problem:
+            evaluation.add(*problem)
     print_evaluation(evaluation)
     if not evaluation.allowed:
         print("WOULD_BLOCK: close policy is not satisfied")

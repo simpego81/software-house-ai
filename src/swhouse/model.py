@@ -32,6 +32,23 @@ GUARDED_RISK_FLAGS = (
     "cross_domain",
 )
 
+KNOWN_RISK_KEYS = frozenset(
+    GUARDED_RISK_FLAGS
+    + (
+        "blast_radius",
+        "reversible",
+        "native_verification_available",
+        "known_good_baseline",
+        "bounded_blast_radius",
+        "stop_condition",
+    )
+)
+
+BLAST_RADIUS_VALUES = ("low", "medium", "high", "recovery")
+
+PENDING_RESOLVED = ("verified", "converted")
+PENDING_STATUSES = ("pending", "verified", "failed", "waived", "converted")
+
 
 @dataclass(frozen=True)
 class Finding:

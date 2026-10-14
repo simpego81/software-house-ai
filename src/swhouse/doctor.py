@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .errors import InvalidStateError
-from .io import load_yaml, parse_markdown_frontmatter
+from .io import load_yaml
+from .legacy import missing_numbers, read_legacy_cycle
 from .store import Store
 
 
@@ -99,6 +100,13 @@ def diagnose(store: Store) -> list[Diagnostic]:
             diagnostics.append(Diagnostic("error", "INVALID_YAML", str(exc), summary_path))
 
     declared_total = summary.get("total_cycles")
+    v2_numbers = _v2_numbers(store)
+    legacy_numbers: list[int] = []
+    for path in legacy_archives:
+        found = read_legacy_cycle(path)
+        if found.number is not None:
+            legacy_numbers.append(found.number)
+    expected_numbers = legacy_numbers + v2_numbers
     if isinstance(declared_total, int) and declared_total != len(legacy_archives):
         diagnostics.append(
             Diagnostic(
@@ -108,24 +116,49 @@ def diagnose(store: Store) -> list[Diagnostic]:
                 summary_path,
             )
         )
+    gaps = missing_numbers(sorted(expected_numbers))
+    if gaps:
+        diagnostics.append(
+            Diagnostic(
+                "warning",
+                "CYCLE_NUMBER_GAP",
+                "Cycle numbers missing from archives: " + ", ".join(f"{value:03d}" for value in gaps),
+                store.root / "cycles",
+            )
+        )
 
     for path in legacy_archives:
-        try:
-            frontmatter = parse_markdown_frontmatter(path)
-        except InvalidStateError as exc:
-            diagnostics.append(Diagnostic("error", "FRONTMATTER", str(exc), path))
+        legacy = read_legacy_cycle(path)
+        if legacy.format == "unknown":
+            diagnostics.append(
+                Diagnostic(
+                    "warning",
+                    "LEGACY_FORMAT_UNKNOWN",
+                    "No frontmatter and no `**Status:**` header; status cannot be determined",
+                    path,
+                )
+            )
             continue
-        if str(frontmatter.get("status", "")).lower() not in ("closed", "decided"):
+        if legacy.stale_header:
+            diagnostics.append(
+                Diagnostic(
+                    "warning",
+                    "STALE_STATUS_HEADER",
+                    f"Header says {legacy.status!r} but the cycle later declares {legacy.final_status!r}",
+                    path,
+                )
+            )
+        elif not legacy.is_closed:
             diagnostics.append(
                 Diagnostic(
                     "error",
                     "ARCHIVED_NOT_CLOSED",
-                    f"Archived cycle has status={frontmatter.get('status')!r}",
+                    f"Archived cycle has status={legacy.status!r}",
                     path,
                 )
             )
-        text = path.read_text(encoding="utf-8").lower()
-        if "awaiting owner approval" in text and str(frontmatter.get("status", "")).lower() == "closed":
+        text = path.read_text(encoding="utf-8", errors="replace").lower()
+        if "awaiting owner approval" in text and legacy.is_closed:
             diagnostics.append(
                 Diagnostic(
                     "warning",
@@ -217,3 +250,13 @@ def diagnose(store: Store) -> list[Diagnostic]:
     if not diagnostics:
         diagnostics.append(Diagnostic("ok", "HEALTHY", "No invariant violations found"))
     return diagnostics
+
+
+def _v2_numbers(store: Store) -> list[int]:
+    numbers: list[int] = []
+    for directory in (store.archive_v2_dir, store.open_dir):
+        if directory.exists():
+            for path in directory.glob("*.yaml"):
+                if path.stem.isdigit():
+                    numbers.append(int(path.stem))
+    return numbers

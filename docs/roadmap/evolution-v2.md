@@ -1,7 +1,9 @@
 # Software House AI v2 roadmap
 
-**Status:** implementation pilot
+**Status:** implementation pilot; opt-in preview published (see [ADR 0002](../decisions/0002-v2-opt-in-preview.md))
 **Target:** evolve from a sequential role simulation to a risk- and evidence-driven organizational runtime
+
+> **Gate status (2026-10-14).** Pilot cycles 003–006 developed the runtime itself, closed within minutes and used only `same-model` challenges. They do not count toward the "five real v2 cycles" gate of phase 2 or the "ten cycles" gate of phase 4. Those gates restart on real work in an adopted instance.
 
 ## Target model
 

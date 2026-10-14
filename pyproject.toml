@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "software-house-ai"
-version = "0.6.0a1"
+version = "0.6.0a2"
 description = "Evidence-driven runtime for Software House AI"
 readme = "README.md"
 requires-python = ">=3.10"

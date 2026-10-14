@@ -17,6 +17,10 @@ Software House AI is a framework for organizing AI agents into a **collaborative
 
 The framework is **agent-agnostic**. An instance may run on Claude, DeepSeek, Gemini, Manus, or any future agent that can read and write files. Each deployment adapts the roles to the agents available.
 
+## v2 preview (opt-in)
+
+An evidence-driven operating model and a small CLI (`swhouse`) are available as an opt-in preview. The default process described below is unchanged. See [docs/evolution-v2-summary.md](docs/evolution-v2-summary.md) and, to migrate a project, [docs/migration/v1-to-v2.md](docs/migration/v1-to-v2.md).
+
 ## What this is not
 
 - A coding framework or library

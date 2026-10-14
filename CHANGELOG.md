@@ -6,6 +6,36 @@ Format: `[version] — YYYY-MM-DD`
 
 ---
 
+## [0.6.0a2] — 2026-10-14 (preview, opt-in)
+
+No change to `CONSTITUTION.md`, `ECOSYSTEM.md`, `agents/` or `protocols/operational-cycle.md`.
+
+### Added
+
+- `swhouse adopt` / `adopt --rollback`: add v2 state next to legacy state; rollback compares SHA-256 and keeps edited files.
+- `swhouse route`: deterministic minimum profile from declared risk.
+- `swhouse add-pending` / `resolve-pending`: human verification with owner, conversion to an automated check, or a waiver that needs an expiry and a reference.
+- Evidence SHA-256 recorded at run time and verified at close and in `doctor`.
+- `doctor` reads both v1 layouts (frontmatter and `**Status:**` header) and reports `CYCLE_NUMBER_GAP` and `STALE_STATUS_HEADER`.
+- `python -m swhouse` entry point.
+- Preview documents: `protocols/operational-cycle-v2.md`, `instances/claude-code/CLAUDE-v2.md`, `docs/migration/v1-to-v2.md`, `docs/evolution-v2-summary.md`, ADR 0002.
+
+### Fixed (reproduced, then covered by `tests/test_hardening.py`)
+
+- An empty `validation.yaml` let an ad-hoc command such as `python -c pass` close an `enforced` cycle. The contract now lives in `validation.yaml`; `enforced` requires it to be non-empty.
+- Editing the cycle file could drop or downgrade a configured required check.
+- Unknown risk keys (for example `attack_surfce`) were ignored and did not escalate to GUARDED; values are now validated.
+- `--optional` after the check id was swallowed into the command and executed.
+- Owner approval could be self-asserted; `approve --ref` records an external reference, required in `enforced` mode.
+- `start` ignored an open v1 cycle (`cycles/current.md`).
+- `doctor` reported false `FRONTMATTER` errors on instances that use the `**Status:**` header format.
+
+### Known limits
+
+See `docs/migration/v1-to-v2.md`, section 8.
+
+---
+
 ## [0.5.0] — 2026-08-27
 
 ### Added (constitutional amendment — Article 25)
