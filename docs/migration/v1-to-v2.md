@@ -180,6 +180,40 @@ Then change `mode: enforced` in `config.yaml`. In `enforced` mode:
 
 These thresholds are the framework's own roadmap gates (`docs/roadmap/evolution-v2.md`). They are a starting rule, not a proven standard.
 
+## 7b. Running the pilot: recording observations
+
+The runtime cannot see tokens or invocations, so cost and fit are recorded with `swhouse observe`. Fix the failure criteria **before** the first cycle; they are in `src/swhouse/observe.py` (`THRESHOLDS`, `MIN_SAMPLE`) and change only before data exists.
+
+Per cycle, by the Operator (a person, not the agent):
+
+```bash
+swhouse start "<task>" ...
+swhouse observe judge accept|conditional|reject --by <you> --reason "<one line>"   # BEFORE the first `close`
+swhouse observe session --minutes 25                                                # once per working session
+swhouse observe friction "<what slowed you down or what you worked around>"
+swhouse close                                                                       # then compare
+swhouse observe defect "<what broke later>" --cycle 003                             # works on archived cycles
+```
+
+`judge` is rejected once `close` has been evaluated and cannot be changed afterwards, so the comparison is blind. Use `observe skip-judgement` if you did not judge; skipped cycles are counted, not hidden.
+
+The runtime also records, without being asked: check runs and failures, every `close` attempt with its blockers, and whether the cycle file was edited outside the CLI (integrity digest). That last one measures the main risk of v2: an agent that bypasses the CLI.
+
+```bash
+swhouse observe report --baseline-minutes 30    # writes .swhouse/metrics/observations.json
+```
+
+| Criterion (default) | Meaning if tripped |
+|---|---|
+| `false_blocks` >= 2 | v2 blocked work you would have accepted: rules or checks too strict |
+| `escaped_defects` >= 1 | v2 passed work that later proved defective: evidence is not enough |
+| `manual_edit_cycles` >= 2 | The agent bypassed the CLI: the obligation problem moved, not solved |
+| median minutes > baseline | No time benefit over v1 for comparable tasks |
+
+`sufficient_sample` is false below 5 cycles; do not decide before it is true. Also compare, for cycles with `different-model` and `same-model` challenges, `challenge_findings_by_reviewer_context`: it shows whether independence found more defects.
+
+Limits: minutes are self-reported; `manual_edits` detects changes to the cycle file, not to the product code; the judgement can be given by the agent if you let it, so run `observe judge` yourself.
+
 ## 8. Known limits
 
 - **Declared risk.** The agent that wants to close declares the risk. The runtime rejects unknown keys and bad values, but cannot tell a false `reversible=true` from a true one.

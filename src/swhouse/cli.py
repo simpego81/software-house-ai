@@ -13,6 +13,7 @@ from .doctor import diagnose
 from .errors import SwhouseError
 from .evidence import evidence_problem, sha256_file
 from .io import load_yaml
+from . import observe
 from .metrics import generate_metrics, write_metrics
 from .model import PENDING_STATUSES, Outcome, Profile, require_outcome, require_profile
 from .policy import evaluate_close, evaluate_route, recommend_profile
@@ -124,6 +125,35 @@ def build_parser() -> argparse.ArgumentParser:
     close.add_argument("--apply", action="store_true", help="archive when policy allows")
 
     subparsers.add_parser("metrics", help="derive v2 metrics from archived cycles")
+
+    observe = subparsers.add_parser("observe", help="record pilot observations for the current or an archived cycle")
+    observe_sub = observe.add_subparsers(dest="observe_command", required=True)
+
+    judge = observe_sub.add_parser(
+        "judge", help="record YOUR verdict before the first `close`; it cannot be recorded or changed afterwards"
+    )
+    judge.add_argument("verdict", choices=("accept", "conditional", "reject"))
+    judge.add_argument("--by", required=True, help="who judged (operator name)")
+    judge.add_argument("--reason")
+    judge.add_argument("--cycle")
+
+    skip = observe_sub.add_parser("skip-judgement", help="explicitly record that no judgement was made")
+    skip.add_argument("--cycle")
+
+    session = observe_sub.add_parser("session", help="add one working session and its minutes")
+    session.add_argument("--minutes", type=int, required=True)
+    session.add_argument("--cycle")
+
+    friction = observe_sub.add_parser("friction", help="note a point of friction with the runtime or process")
+    friction.add_argument("text")
+    friction.add_argument("--cycle")
+
+    defect = observe_sub.add_parser("defect", help="note a defect found AFTER the cycle closed (works on archived cycles)")
+    defect.add_argument("text")
+    defect.add_argument("--cycle", required=True)
+
+    report = observe_sub.add_parser("report", help="aggregate observations against the pre-set failure criteria")
+    report.add_argument("--baseline-minutes", type=float, help="median minutes of comparable v1 tasks")
     return parser
 
 
@@ -159,6 +189,8 @@ def dispatch(args: argparse.Namespace) -> int:
         return command_resolve_pending(store, args)
     if args.command == "adopt":
         return command_adopt(store, args)
+    if args.command == "observe":
+        return command_observe(store, args)
     if args.command == "record-challenge":
         return command_record_challenge(store, args)
     if args.command == "resolve":
@@ -587,6 +619,7 @@ def command_run_check(store: Store, args: argparse.Namespace) -> int:
     checks = cycle.setdefault("checks", [])
     checks[:] = [item for item in checks if item.get("id") != args.check_id]
     checks.append(record)
+    observe.record_check_run(cycle, result.returncode == 0)
     store.save_open(path, cycle)
     print(f"{record['status'].upper()} {args.check_id} (exit {result.returncode}) -> {record['evidence']}")
     return result.returncode
@@ -616,6 +649,9 @@ def command_close(store: Store, args: argparse.Namespace) -> int:
         if problem:
             evaluation.add(*problem)
     print_evaluation(evaluation)
+    if not args.apply or not evaluation.allowed:
+        observe.record_close_attempt(cycle, evaluation.allowed, [item.code for item in evaluation.blockers])
+        store.save_open(path, cycle)
     if not evaluation.allowed:
         print("WOULD_BLOCK: close policy is not satisfied")
         return 1
@@ -629,6 +665,43 @@ def command_close(store: Store, args: argparse.Namespace) -> int:
     destination = store.archive(path, cycle)
     mode = cycle.get("governance_mode", "shadow")
     print(f"Archived {mode} cycle {cycle['id']}: {destination.relative_to(store.project_root)}")
+    return 0
+
+
+def command_observe(store: Store, args: argparse.Namespace) -> int:
+    sub = args.observe_command
+    if sub == "report":
+        cycles = [load_yaml(item) for item in sorted(store.archive_v2_dir.glob("*.yaml"))] if store.archive_v2_dir.exists() else []
+        cycles += [load_yaml(item) for item in store.open_paths()]
+        report = observe.aggregate(cycles, args.baseline_minutes)
+        destination = store.root / "metrics" / "observations.json"
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+        if not report["sufficient_sample"]:
+            print(f"NOTE: {report['sample_size']} cycle(s); at least {observe.MIN_SAMPLE} are needed before deciding")
+        if report["any_criterion_tripped"]:
+            print("TRIPPED: at least one failure criterion was reached; see failure_criteria")
+        return 0
+
+    path, cycle, is_open = store.find_cycle(getattr(args, "cycle", None))
+    if sub == "defect":
+        observe.record_defect(cycle, args.text)
+    elif not is_open:
+        raise SwhouseError(f"observe {sub} applies to an open cycle; cycle {cycle.get('id')} is archived")
+    elif sub == "judge":
+        observe.record_judgement(cycle, args.verdict, args.by, args.reason)
+    elif sub == "skip-judgement":
+        observe.record_skip(cycle)
+    elif sub == "session":
+        observe.record_session(cycle, args.minutes)
+    elif sub == "friction":
+        observe.record_friction(cycle, args.text)
+    if is_open:
+        store.save_open(path, cycle)
+    else:
+        store.save_archived(path, cycle)
+    print(f"Cycle {cycle['id']} observation recorded: {sub}")
     return 0
 
 

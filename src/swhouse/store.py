@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +21,7 @@ def utc_now() -> str:
 class Store:
     def __init__(self, project_root: Path):
         self.project_root = project_root.resolve()
+        self._edited: set[str] = set()
         self.root = self.project_root / ".swhouse"
         if not self.root.is_dir():
             raise InvalidStateError(f"No .swhouse directory under {self.project_root}")
@@ -63,7 +66,11 @@ class Store:
             raise InvalidStateError("No v2 cycle is open")
         else:
             raise InvalidStateError("Multiple cycles are open; specify --cycle")
-        return path, load_yaml(path)
+        cycle = load_yaml(path)
+        recorded = cycle.get("integrity")
+        if recorded and recorded != cycle_digest(cycle):
+            self._edited.add(str(cycle.get("id")))
+        return path, cycle
 
     def next_cycle_id(self) -> str:
         identifiers: list[int] = []
@@ -97,21 +104,59 @@ class Store:
         path = self.open_dir / f"{cycle['id']}.yaml"
         if path.exists():
             raise InvalidStateError(f"Cycle already exists: {cycle['id']}")
+        cycle["integrity"] = cycle_digest(cycle)
         write_yaml_atomic(path, cycle)
         return path
 
     def save_open(self, path: Path, cycle: dict[str, Any]) -> None:
         if path.parent.resolve() != self.open_dir.resolve():
             raise InvalidStateError("Refusing to update a cycle outside cycles/open")
+        self._stamp(cycle)
         write_yaml_atomic(path, cycle)
+
+    def _stamp(self, cycle: dict[str, Any]) -> None:
+        if str(cycle.get("id")) in self._edited:
+            self._edited.discard(str(cycle.get("id")))
+            cycle.setdefault("observations", {}).setdefault("manual_edits", []).append(
+                {"detected_at": utc_now(), "note": "cycle file changed outside the CLI"}
+            )
+        cycle["integrity"] = cycle_digest(cycle)
 
     def archive(self, path: Path, cycle: dict[str, Any]) -> Path:
         destination = self.archive_v2_dir / path.name
         if destination.exists():
             raise InvalidStateError(f"Archive destination already exists: {destination}")
+        self._stamp(cycle)
         write_yaml_atomic(destination, cycle)
         path.unlink()
         return destination
+
+    def find_cycle(self, cycle_id: str | None = None) -> tuple[Path, dict[str, Any], bool]:
+        """Return (path, cycle, is_open). Without an id, the open cycle; with one, open or archived."""
+        if cycle_id is None or self.open_paths():
+            try:
+                path, cycle = self.get_open(cycle_id)
+                return path, cycle, True
+            except InvalidStateError:
+                if cycle_id is None:
+                    raise
+        normalized = normalize_cycle_id(str(cycle_id))
+        for path in self.archive_v2_dir.glob("*.yaml") if self.archive_v2_dir.exists() else []:
+            if normalize_cycle_id(path.stem) == normalized:
+                return path, load_yaml(path), False
+        raise InvalidStateError(f"Cycle {normalized} not found among open or archived v2 cycles")
+
+    def save_archived(self, path: Path, cycle: dict[str, Any]) -> None:
+        if path.parent.resolve() != self.archive_v2_dir.resolve():
+            raise InvalidStateError("Refusing to update a cycle outside cycles/archive-v2")
+        cycle["integrity"] = cycle_digest(cycle)
+        write_yaml_atomic(path, cycle)
+
+
+def cycle_digest(cycle: dict[str, Any]) -> str:
+    body = {key: value for key, value in cycle.items() if key != "integrity"}
+    payload = json.dumps(body, sort_keys=True, default=str, ensure_ascii=False)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 def normalize_cycle_id(value: str) -> str:

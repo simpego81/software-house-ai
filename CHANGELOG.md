@@ -18,6 +18,8 @@ No change to `CONSTITUTION.md`, `ECOSYSTEM.md`, `agents/` or `protocols/operatio
 - Evidence SHA-256 recorded at run time and verified at close and in `doctor`.
 - `doctor` reads both v1 layouts (frontmatter and `**Status:**` header) and reports `CYCLE_NUMBER_GAP` and `STALE_STATUS_HEADER`.
 - `python -m swhouse` entry point.
+- `swhouse observe` (`judge`, `skip-judgement`, `session`, `friction`, `defect`, `report`): pilot observations with failure criteria fixed in `observe.py`. The Operator's verdict must precede the first `close` and cannot be changed. `report` writes `metrics/observations.json`.
+- Cycle integrity digest: edits to a cycle file outside the CLI are recorded in `observations.manual_edits`. Also records check runs and every `close` attempt with its blockers.
 - Preview documents: `protocols/operational-cycle-v2.md`, `instances/claude-code/CLAUDE-v2.md`, `docs/migration/v1-to-v2.md`, `docs/evolution-v2-summary.md`, ADR 0002.
 
 ### Fixed (reproduced, then covered by `tests/test_hardening.py`)

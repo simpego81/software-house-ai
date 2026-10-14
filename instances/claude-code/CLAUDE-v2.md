@@ -36,7 +36,7 @@ swhouse close --apply
 Rules:
 
 1. Never edit files under `.swhouse/cycles/` or `.swhouse/evidence/` by hand. The close policy checks digests; a hand edit is a failed close, and in review it looks like fabrication.
-2. Never run `swhouse approve`. Approval belongs to the Owner, who passes `--ref` pointing at something outside this session.
+2. Never run `swhouse approve` or `swhouse observe judge` / `skip-judgement` / `defect`. Approval and the verdict on the work belong to the Owner or Operator, who passes `--ref` for approvals, pointing at something outside this session. You may run `swhouse observe friction` when the process got in your way.
 3. Set `--reviewer-context same-model` when you reviewed your own work. Do not claim `fresh-context` unless a separate session with no access to your reasoning did the review.
 4. If a check cannot run here, add a pending-human item. Do not mark the criterion met and do not describe logical inspection as verification.
 5. A regression with a known commit is a REVERT cycle: `swhouse prepare-revert <commit> --reason "<why>"`, then `apply-revert` (dry run first), then re-run the checks.
